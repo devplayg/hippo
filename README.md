@@ -1,2 +1,3 @@
-# receiver
+# Hippo
+
 Data receiver in Go
