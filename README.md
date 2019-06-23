@@ -1,8 +1,8 @@
 # Hippo
 
-Hippo Server is an easy, fast, lightweight server framework.
+Hippo Server is an easy, fast, lightweight server framework. He loves eating data.
 
-![Hippo](./docs/hippo.png)
+![Hippo](./doc/hippo.png)
 
 ## Readers
 
