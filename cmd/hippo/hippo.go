@@ -3,69 +3,54 @@ package main
 import (
 	"fmt"
 	"github.com/devplayg/hippo/engine"
-	"github.com/devplayg/hippo/lib"
-	"github.com/devplayg/hippo/obj"
-	"github.com/devplayg/hippo/server"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/pflag"
 	"os"
+	"runtime"
 )
 
 const (
-	appName    = "hippo"
-	appVersion = "0.1"
+	appName        = "hippo"
+	appDescription = "Hippo Server"
+	appVersion     = "0.1"
 )
 
 var (
-	option *obj.Option
+	option *engine.Option
 )
 
 func main() {
-	hippoEngine := engine.NewEngine(option)
-	err := hippoEngine.Start()
-	if err != nil {
-		panic(err)
-	}
 
-	hippoReader := server.NewVirtualReader()
-	err = hippoReader.Start()
-	if err != nil {
-		log.Error(err)
-	}
-	hippoReader.Read([]byte("asdfasdf"))
-
-	lib.WaitForSignals()
+	//engine := engine.NewEngine(option)
+	//err := engine.Start(server.NewHippoServer())
+	//if err != nil {
+	//	panic(err)
+	//}
 }
 
 func init() {
 	// Get flag set
-	fs := pflag.NewFlagSet("dff", pflag.ContinueOnError)
+	fs := pflag.NewFlagSet(appName, pflag.ContinueOnError)
 
-	// Get arguments
-	debug := fs.BoolP("debug", "d", false, "Debug")
+	// Options
+	//debug := fs.BoolP("debug", "d", false, "Debug")
+	cpu := fs.Uint8P("cpu", "c", 0, "CPU Count")
+
+	// Usage
 	fs.Usage = func() {
-		fmt.Printf("Duplicate file finder v%s\n\n", appVersion)
+		fmt.Printf("%s v%s\n\n", appDescription, appVersion)
 		fs.PrintDefaults()
 	}
 	_ = fs.Parse(os.Args[1:])
 
 	// Set options
-	option = &obj.Option{
-		AppName:    appName,
-		AppVersion: appVersion,
-		Debug:      *debug,
-	}
 
-	// CPU 설정
-	//runtime.GOMAXPROCS(runtime.NumCPU())
+	//option = &engine.Option{
+	//	Name:        appName,
+	//	Version:     appVersion,
+	//	Description: appDescription,
+	//	Debug:       *debug,
+	//}
 
-	//dff.InitLogger(*verbose)
-
-	//hippoEngine = engine.NewEngine(appName, *debug)
-	//duplicateFileFinder = dff.NewDuplicateFileFinder(*dirs, *minNumOfFilesInFileGroup, *minFileSize, *sortBy, *format)
+	// Number of logical CPUs usable
+	runtime.GOMAXPROCS(int(*cpu))
 }
-
-//func printHelp() {
-//	fmt.Printf("%s v%s\n\n", appDescription, appVersion)
-//	fs.PrintDefaults()
-//}
