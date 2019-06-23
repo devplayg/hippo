@@ -1,6 +1,8 @@
 # Hippo
 
-Data dispatcher
+Hippo Server is an easy, fast, lightweight server framework.
+
+![Hippo](docs/hippo.png)
 
 ## Readers
 
