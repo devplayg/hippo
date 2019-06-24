@@ -60,6 +60,11 @@ func init() {
 	option.Dir = *dir
 	option.Storage = *storage
 
+	err := option.Validate()
+	if err != nil {
+		panic(err)
+	}
+
 	// Number of logical CPUs usable
 	runtime.GOMAXPROCS(*cpu)
 }

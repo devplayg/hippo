@@ -1,5 +1,10 @@
 package classifier
 
+import (
+	"github.com/devplayg/hippo"
+	"path/filepath"
+)
+
 type Option struct {
 	name        string
 	description string
@@ -36,8 +41,24 @@ func (c *Option) Debug() bool {
 }
 
 func (c *Option) Validate() error {
-	//if len(c.Dir) < 1 {
-	//	return
-	//}
+	if len(c.Dir) < 1 {
+		return hippo.ErrorRequiredOption
+	}
+
+	abs, err := filepath.Abs(c.Dir)
+	if err != nil {
+		return hippo.ErrorInvalidDirectory
+	}
+	c.Dir = abs
+
+	if len(c.Storage) < 1 {
+		return hippo.ErrorRequiredOption
+	}
+
+	abs, err = filepath.Abs(c.Storage)
+	if err != nil {
+		return hippo.ErrorInvalidDirectory
+	}
+	c.Storage = abs
 	return nil
 }

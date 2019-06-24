@@ -10,6 +10,7 @@ type Option interface {
 	Name() string
 	Version() string
 	Description() string
+	Validate() error
 }
 
 type Engine struct {
@@ -55,7 +56,12 @@ func NewEngine(option Option) *Engine {
 }
 
 func (e *Engine) Start(server Server) error {
-	err := server.Start(e)
+	err := e.Option.Validate()
+	if err != nil {
+		panic(err)
+	}
+
+	err = server.Start(e)
 	if err != nil {
 		panic(err)
 	}
