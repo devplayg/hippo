@@ -34,3 +34,10 @@ func (c *Option) Version() string {
 func (c *Option) Debug() bool {
 	return c.debug
 }
+
+func (c *Option) Validate() error {
+	//if len(c.Dir) < 1 {
+	//	return
+	//}
+	return nil
+}

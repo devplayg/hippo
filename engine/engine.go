@@ -1,5 +1,10 @@
 package engine
 
+import (
+	"os"
+	"path/filepath"
+)
+
 type Option interface {
 	Debug() bool
 	Name() string
@@ -8,8 +13,7 @@ type Option interface {
 }
 
 type Server interface {
-	Start() error
-	SetEngine(*Engine)
+	Start(engine *Engine) error
 }
 
 type Engine struct {
@@ -17,8 +21,10 @@ type Engine struct {
 	description string
 	version     string
 	debug       bool
-	Option      Option
-	server      Server
+
+	Option     Option
+	server     Server
+	WorkingDir string
 
 	//	//Config      map[string]string
 	//	debug      bool
@@ -45,14 +51,13 @@ func NewEngine(option Option) *Engine {
 		//debug:       option.Debug(),
 	}
 	//e.LogPrefix = "[" + e.processName + "] "
-	//abs, _ := filepath.Abs(os.Args[0])
-	//e.ProcessDir = filepath.Dir(abs)
+	workingDir, _ := filepath.Abs(os.Args[0])
+	e.WorkingDir = filepath.Dir(workingDir)
 	return &e
 }
 
 func (e *Engine) Start(server Server) error {
-	server.SetEngine(e)
-	err := server.Start()
+	err := server.Start(e)
 	if err != nil {
 		panic(err)
 	}

@@ -13,12 +13,15 @@ func NewClassifier() *Classifier {
 	return &Classifier{}
 }
 
-func (c *Classifier) Start() error {
+func (c *Classifier) Start(engine *engine.Engine) error {
+	c.engine = engine
 	option := c.engine.Option.(*classifier.Option)
 	println(option.Storage)
+	println(option.Dir)
+	println(c.engine.WorkingDir)
 	return nil
 }
 
-func (c *Classifier) SetEngine(e *engine.Engine) {
-	c.engine = e
-}
+//func (c *Classifier) SetEngine(e *engine.Engine) {
+//	c.engine = e
+//}

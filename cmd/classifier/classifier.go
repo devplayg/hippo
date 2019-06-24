@@ -7,6 +7,7 @@ import (
 	"github.com/devplayg/hippo/server"
 	"github.com/spf13/pflag"
 	"os"
+	"path/filepath"
 	"runtime"
 )
 
@@ -29,21 +30,31 @@ func main() {
 }
 
 func init() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
+
 	// Get flag set
 	fs := pflag.NewFlagSet(appName, pflag.ContinueOnError)
 
 	// Options
 	debug := fs.Bool("debug", false, "Debug")
-	cpu := fs.Uint8P("cpu", "c", 0, "CPU Count")
-	dir := fs.StringP("dir", "d", "", "Source directory")
+	cpu := fs.IntP("cpu", "c", 0, "CPU Count")
+	dir := fs.StringP("dir", "d", "", "Source directory (required)")
 	storage := fs.StringP("storage", "s", "/storage", "Storage")
 
 	// Usage
 	fs.Usage = func() {
-		fmt.Printf("%s v%s\n\n", appDescription, appVersion)
+		fmt.Printf("%s v%s\n", appDescription, appVersion)
 		fs.PrintDefaults()
 	}
 	_ = fs.Parse(os.Args[1:])
+
+	if len(*dir) < 1 {
+		fs.Usage()
+		os.Exit(1)
+	}
+
+	abs, _ := filepath.Abs(*dir)
+	println(abs)
 
 	// Set options
 	option = classifier.NewOption(appName, appDescription, appVersion, *debug)
@@ -51,5 +62,5 @@ func init() {
 	option.Storage = *storage
 
 	// Number of logical CPUs usable
-	runtime.GOMAXPROCS(int(*cpu))
+	runtime.GOMAXPROCS(*cpu)
 }
