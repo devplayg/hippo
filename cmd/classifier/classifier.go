@@ -2,9 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/devplayg/hippo"
 	"github.com/devplayg/hippo/classifier"
-	"github.com/devplayg/hippo/engine"
-	"github.com/devplayg/hippo/server"
 	"github.com/spf13/pflag"
 	"os"
 	"path/filepath"
@@ -22,8 +21,8 @@ var (
 )
 
 func main() {
-	engine := engine.NewEngine(option)
-	err := engine.Start(server.NewClassifier())
+	engine := hippo.NewEngine(option)
+	err := engine.Start(classifier.NewClassifier())
 	if err != nil {
 		panic(err)
 	}

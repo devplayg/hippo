@@ -1,21 +1,20 @@
-package server
+package classifier
 
 import (
-	"github.com/devplayg/hippo/classifier"
-	"github.com/devplayg/hippo/engine"
+	"github.com/devplayg/hippo"
 )
 
 type Classifier struct {
-	engine *engine.Engine
+	engine *hippo.Engine
 }
 
 func NewClassifier() *Classifier {
 	return &Classifier{}
 }
 
-func (c *Classifier) Start(engine *engine.Engine) error {
+func (c *Classifier) Start(engine *hippo.Engine) error {
 	c.engine = engine
-	option := c.engine.Option.(*classifier.Option)
+	option := c.engine.Option.(*Option)
 	println(option.Storage)
 	println(option.Dir)
 	println(c.engine.WorkingDir)

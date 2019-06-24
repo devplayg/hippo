@@ -1,4 +1,4 @@
-package engine
+package hippo
 
 import (
 	"os"
@@ -12,19 +12,16 @@ type Option interface {
 	Description() string
 }
 
-type Server interface {
-	Start(engine *Engine) error
-}
-
 type Engine struct {
 	name        string
 	description string
 	version     string
 	debug       bool
+	WorkingDir  string
+	processName string
 
-	Option     Option
-	server     Server
-	WorkingDir string
+	Option Option
+	server Server
 
 	//	//Config      map[string]string
 	//	debug      bool
@@ -44,7 +41,8 @@ type Engine struct {
 //
 func NewEngine(option Option) *Engine {
 	e := Engine{
-		Option: option,
+		Option:      option,
+		processName: GetProcessName(),
 		//name:        option.Name(),
 		//description: option.Version(),
 		//version:     option.Version(),
