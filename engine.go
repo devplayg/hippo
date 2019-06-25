@@ -6,40 +6,31 @@ import (
 )
 
 type Engine struct {
-	name        string
-	description string
-	version     string
-	debug       bool
 	WorkingDir  string
+	ErrChan     chan error
 	processName string
-
-	Option Option
-	server Server
+	server      Server
 }
 
-func NewEngine(server Server, option Option) *Engine {
+func NewEngine(server Server) *Engine {
 	e := Engine{
-		Option:      option,
 		processName: GetProcessName(),
 		server:      server,
+		ErrChan:     make(chan error),
 	}
 	server.SetEngine(&e)
-	//e.LogPrefix = "[" + e.processName + "] "
 	workingDir, _ := filepath.Abs(os.Args[0])
 	e.WorkingDir = filepath.Dir(workingDir)
 	return &e
 }
 
 func (e *Engine) Start() error {
-	err := e.Option.Validate()
-	if err != nil {
-		panic(err)
-	}
-	err = e.server.Start()
-	if err != nil {
-		panic(err)
-	}
+	go drainError(e.ErrChan)
 
+	err := e.server.Start()
+	if err != nil {
+		panic(err)
+	}
 	return nil
 }
 

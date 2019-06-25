@@ -2,6 +2,8 @@ package hippo
 
 import (
 	"fmt"
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/pflag"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -19,5 +21,23 @@ func WaitForSignals() {
 	select {
 	case <-signalCh:
 		fmt.Println("Signal received, shutting down...")
+	}
+}
+
+func drainError(errChan <-chan error) {
+	for {
+		select {
+		case err := <-errChan:
+			if err != nil {
+				log.Error(err)
+			}
+		}
+	}
+}
+
+func Usage(fs *pflag.FlagSet, description, version string) func() {
+	return func() {
+		fmt.Printf("%s v%s\n", description, version)
+		fs.PrintDefaults()
 	}
 }
