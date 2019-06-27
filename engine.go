@@ -10,6 +10,7 @@ type Engine struct {
 	ErrChan     chan error
 	processName string
 	server      Server
+	logFile     string
 }
 
 func NewEngine(server Server) *Engine {
@@ -19,8 +20,15 @@ func NewEngine(server Server) *Engine {
 		ErrChan:     make(chan error),
 	}
 	server.SetEngine(&e)
+
 	workingDir, _ := filepath.Abs(os.Args[0])
 	e.WorkingDir = filepath.Dir(workingDir)
+
+	err := e.initLogger()
+	if err != nil {
+		panic(err)
+	}
+
 	return &e
 }
 
@@ -40,4 +48,9 @@ func (e *Engine) Stop() error {
 		return err
 	}
 	return nil
+}
+
+func (e *Engine) initLogger() error {
+	logFile := filepath.Join(e.WorkingDir, filepath.Base(e.processName)+".log")
+	return initLogger(logFile, e.server.IsDebug())
 }

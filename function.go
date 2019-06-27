@@ -11,6 +11,10 @@ import (
 	"syscall"
 )
 
+func init() {
+	log.SetFormatter(&log.JSONFormatter{})
+}
+
 func GetProcessName() string {
 	return strings.TrimSuffix(filepath.Base(os.Args[0]), filepath.Ext(os.Args[0]))
 }
@@ -40,4 +44,18 @@ func Usage(fs *pflag.FlagSet, description, version string) func() {
 		fmt.Printf("%s v%s\n", description, version)
 		fs.PrintDefaults()
 	}
+}
+
+func initLogger(path string, debug bool) error {
+	file, err := os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+	if err != nil {
+		return err
+	}
+	log.SetOutput(file)
+
+	if debug {
+		log.SetLevel(log.DebugLevel)
+		log.Debug("debug mode")
+	}
+	return nil
 }
