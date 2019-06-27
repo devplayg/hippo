@@ -1,3 +1,4 @@
+// Hippo is an easy, fast, lightweight server framework.
 package hippo
 
 import (
@@ -5,6 +6,7 @@ import (
 	"path/filepath"
 )
 
+// Engine supports engine framework.
 type Engine struct {
 	WorkingDir  string
 	ErrChan     chan error
@@ -13,6 +15,7 @@ type Engine struct {
 	logFile     string
 }
 
+// NewEngine allocates a new server to engine.
 func NewEngine(server Server) *Engine {
 	e := Engine{
 		processName: GetProcessName(),
@@ -32,6 +35,7 @@ func NewEngine(server Server) *Engine {
 	return &e
 }
 
+// Start starts server and opens error channel.
 func (e *Engine) Start() error {
 	go drainError(e.ErrChan)
 
@@ -42,6 +46,7 @@ func (e *Engine) Start() error {
 	return nil
 }
 
+// Stop stops engine.
 func (e *Engine) Stop() error {
 	err := e.server.Stop()
 	if err != nil {
