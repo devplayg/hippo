@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"github.com/devplayg/hippo"
 	"log"
+	"time"
 )
 
 const (
@@ -32,7 +34,13 @@ func main() {
 type SimpleServer struct{}
 
 func (s *SimpleServer) Start() error {
-
+	go func() {
+		// Do work here
+		for {
+			fmt.Println("Hello hippo")
+			time.Sleep(10 * time.Second)
+		}
+	}()
 	return nil
 }
 
