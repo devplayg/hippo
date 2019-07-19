@@ -2,6 +2,7 @@
 package hippo
 
 import (
+	"github.com/sirupsen/logrus"
 	"os"
 	"path/filepath"
 )
@@ -9,40 +10,38 @@ import (
 // Engine supports engine framework.
 type Engine struct {
 	WorkingDir  string
-	ErrChan     chan error
 	processName string
 	server      Server
-	logFile     string
+	Config      *Config
 }
 
 // NewEngine allocates a new server to engine.
-func NewEngine(server Server) *Engine {
+func NewEngine(server Server, config *Config) *Engine {
 	e := Engine{
-		processName: GetProcessName(),
+		processName: config.Name,
 		server:      server,
-		ErrChan:     make(chan error),
+		Config:      config,
 	}
-	server.SetEngine(&e)
 
-	workingDir, _ := filepath.Abs(os.Args[0])
-	e.WorkingDir = filepath.Dir(workingDir)
-
-	err := e.initLogger()
+	workingDir, err := filepath.Abs(os.Args[0])
 	if err != nil {
 		panic(err)
 	}
-
+	e.WorkingDir = filepath.Dir(workingDir)
 	return &e
 }
 
 // Start starts server and opens error channel.
 func (e *Engine) Start() error {
-	go drainError(e.ErrChan)
-
 	err := e.server.Start()
 	if err != nil {
-		panic(err)
+		return err
 	}
+	defer e.Stop()
+
+	logrus.Infof("%s is started.", e.Config.Name)
+	WaitForSignals()
+
 	return nil
 }
 
@@ -50,12 +49,9 @@ func (e *Engine) Start() error {
 func (e *Engine) Stop() error {
 	err := e.server.Stop()
 	if err != nil {
+		logrus.Error("failed to stop %s", e.Config.Name)
 		return err
 	}
+	logrus.Infof("%s is stopped.", e.Config.Name)
 	return nil
-}
-
-func (e *Engine) initLogger() error {
-	logFile := filepath.Join(e.WorkingDir, filepath.Base(e.processName)+".log")
-	return initLogger(logFile, e.server.IsDebug())
 }
