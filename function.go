@@ -30,5 +30,6 @@ func Usage(fs *pflag.FlagSet, description, version string) func() {
 	return func() {
 		fmt.Printf("%s v%s\n", description, version)
 		fs.PrintDefaults()
+		os.Exit(1)
 	}
 }
