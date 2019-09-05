@@ -7,5 +7,4 @@ type Config struct {
 	Description string
 	Version     string
 	Debug       bool
-	Verbose     bool
 }

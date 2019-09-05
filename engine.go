@@ -39,7 +39,7 @@ func (e *Engine) Start() error {
 	}
 	defer e.Stop()
 
-	logrus.Infof("%s is started.", e.Config.Name)
+	logrus.Infof("%s started.", e.Config.DisplayName)
 	WaitForSignals()
 
 	return nil
@@ -49,9 +49,9 @@ func (e *Engine) Start() error {
 func (e *Engine) Stop() error {
 	err := e.server.Stop()
 	if err != nil {
-		logrus.Error("failed to stop %s", e.Config.Name)
+		logrus.Error("failed to stop %s", e.Config.DisplayName)
 		return err
 	}
-	logrus.Infof("%s is stopped.", e.Config.Name)
+	logrus.Infof("%s has stopped.", e.Config.DisplayName)
 	return nil
 }

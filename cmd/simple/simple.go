@@ -21,7 +21,6 @@ func main() {
 		Description: appDescription,
 		Version:     appVersion,
 		Debug:       true,
-		Verbose:     false,
 	}
 	simpleServer := &SimpleServer{}
 	engine := hippo.NewEngine(simpleServer, config)
