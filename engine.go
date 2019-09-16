@@ -5,6 +5,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 // Engine supports engine framework.
@@ -13,6 +14,7 @@ type Engine struct {
 	processName string
 	server      Server
 	Config      *Config
+	started     time.Time
 }
 
 // NewEngine allocates a new server to engine.
@@ -21,6 +23,7 @@ func NewEngine(server Server, config *Config) *Engine {
 		processName: config.Name,
 		server:      server,
 		Config:      config,
+		started:     time.Now(),
 	}
 
 	workingDir, err := filepath.Abs(os.Args[0])
@@ -40,7 +43,9 @@ func (e *Engine) Start() error {
 	defer e.Stop()
 
 	logrus.Infof("%s started.", e.Config.DisplayName)
-	WaitForSignals()
+	if e.Config.IsService {
+		WaitForSignals()
+	}
 
 	return nil
 }
@@ -52,6 +57,6 @@ func (e *Engine) Stop() error {
 		logrus.Error("failed to stop %s", e.Config.DisplayName)
 		return err
 	}
-	logrus.Infof("%s has stopped.", e.Config.DisplayName)
+	logrus.Infof("%s has stopped.(running time: %s)", e.Config.DisplayName, time.Since(e.started))
 	return nil
 }
