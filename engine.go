@@ -42,7 +42,7 @@ func (e *Engine) Start() error {
 	}
 	defer e.Stop()
 
-	logrus.Infof("%s hash been started", e.Config.DisplayName)
+	logrus.Infof("%s has been started", e.Config.DisplayName)
 	if e.Config.IsService {
 		WaitForSignals()
 	}
