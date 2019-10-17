@@ -42,7 +42,7 @@ func (e *Engine) Start() error {
 	}
 	defer e.Stop()
 
-	logrus.Infof("%s started.", e.Config.DisplayName)
+	logrus.Infof("%s hash been started", e.Config.DisplayName)
 	if e.Config.IsService {
 		WaitForSignals()
 	}
@@ -57,6 +57,6 @@ func (e *Engine) Stop() error {
 		logrus.Error("failed to stop %s", e.Config.DisplayName)
 		return err
 	}
-	logrus.Infof("%s has stopped.(running time: %s)", e.Config.DisplayName, time.Since(e.started))
+	logrus.Infof("%s has been stopped (running time: %s)", e.Config.DisplayName, time.Since(e.started))
 	return nil
 }
