@@ -36,6 +36,8 @@ func NewEngine(server Server, config *Config) *Engine {
 
 // Start starts server and opens error channel.
 func (e *Engine) Start() error {
+	e.server.SetEngine(e)
+
 	err := e.server.Start()
 	if err != nil {
 		return err

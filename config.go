@@ -8,4 +8,5 @@ type Config struct {
 	Version     string
 	Debug       bool
 	IsService   bool
+	Verbose     bool
 }
