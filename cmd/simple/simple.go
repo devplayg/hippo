@@ -26,17 +26,32 @@ type SimpleServer struct {
 }
 
 func (s *SimpleServer) Start() error {
+
 	go func() {
+		//defer func() {
+		//}()
+		interval := 5 * time.Second
 		// Do work here
 		for {
-			log.Infof("Hello %s\n", s.engine.Config.Name)
-			time.Sleep(10 * time.Second)
+			log.Infof("Hello %s", s.engine.Config.Name)
+
+			select {
+			case <-s.engine.Ctx.Done():
+				s.engine.Done <- true
+				return
+
+			case <-time.After(interval):
+			}
 		}
 	}()
 	return nil
 }
 
 func (s *SimpleServer) Stop() error {
+	//log.Infof("%s stopped", s.engine.Config.Name)
+	//if s.engine.Config.IsService {
+	//	s.engine.Done<-true
+	//}
 	return nil
 }
 
