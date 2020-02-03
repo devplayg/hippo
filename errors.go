@@ -1,6 +1,8 @@
 package hippo
 
-import "github.com/pkg/errors"
+import (
+	"github.com/pkg/errors"
+)
 
 var (
 	ErrorRequiredOption    = errors.New("required option")

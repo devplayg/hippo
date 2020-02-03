@@ -1,42 +1,35 @@
 package main
 
 import (
-	"fmt"
 	"github.com/devplayg/hippo"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"time"
-)
-
-const (
-	appName        = "devplayg"
-	appDisplayName = "Simple server"
-	appDescription = "Simple server based on Hippo "
-	appVersion     = "1.0.0"
 )
 
 func main() {
 	config := &hippo.Config{
-		Name:        appName,
-		DisplayName: appDisplayName,
-		Description: appDescription,
-		Version:     appVersion,
+		Name:        "server",
+		DisplayName: "simple server",
+		Description: "simple server based on Hippo",
+		Version:     "1.0.1",
 		Debug:       true,
+		IsService:   true,
 	}
-	simpleServer := &SimpleServer{}
-	engine := hippo.NewEngine(simpleServer, config)
-	err := engine.Start()
-	if err != nil {
+	engine := hippo.NewEngine(&SimpleServer{}, config)
+	if err := engine.Start(); err != nil {
 		log.Fatal(err)
 	}
 }
 
-type SimpleServer struct{}
+type SimpleServer struct {
+	engine *hippo.Engine
+}
 
 func (s *SimpleServer) Start() error {
 	go func() {
 		// Do work here
 		for {
-			fmt.Println("Hello hippo")
+			log.Infof("Hello %s\n", s.engine.Config.Name)
 			time.Sleep(10 * time.Second)
 		}
 	}()
@@ -45,4 +38,8 @@ func (s *SimpleServer) Start() error {
 
 func (s *SimpleServer) Stop() error {
 	return nil
+}
+
+func (s *SimpleServer) SetEngine(e *hippo.Engine) {
+	s.engine = e
 }
