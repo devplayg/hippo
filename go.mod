@@ -1,4 +1,4 @@
-module github.com/devplayg/hippo
+module github.com/devplayg/hippo/v2
 
 go 1.13
 
