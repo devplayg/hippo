@@ -4,7 +4,7 @@ Hippo is an easy, fast, lightweight server engine which supports gracefully shut
 
 - powered by Go, Logrus
 
-![Hippo](doc/hippo.png)
+![Hippo](hippo.png)
 
 
 ## Struct
