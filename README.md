@@ -49,14 +49,12 @@ if err := engine.Start(); err != nil {
 ### Log to the file
 
 ```go
-func main() {
-	config := &hippo.Config{
-		Debug:  true,
-		LogDir: ".",
-	}
-	engine := hippo.NewEngine(&SimpleServer{}, config)
-	if err := engine.Start(); err != nil {
-		panic(err)
-	}
+config := &hippo.Config{
+    Debug:  true,
+    LogDir: ".",
+}
+engine := hippo.NewEngine(&SimpleServer{}, config)
+if err := engine.Start(); err != nil {
+    panic(err)
 }
 ```
