@@ -2,6 +2,8 @@
 
 Hippo is an easy, fast, lightweight server engine which supports gracefully shutdown.
 
+[![Build Status](https://travis-ci.org/devplayg/hippo.svg?branch=context)](https://travis-ci.org/devplayg/hippo)
+
 - powered by Go, Logrus
 
 ![Hippo](hippo.png)
