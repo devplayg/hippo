@@ -2,7 +2,10 @@
 
 Hippo is an easy, fast, lightweight server engine which supports gracefully shutdown.
 
+- powered by Go, Logrus
+
 ![Hippo](doc/hippo.png)
+
 
 ## Struct
 
@@ -22,7 +25,7 @@ func (s *SimpleServer) Stop() error {
 
 ## Run
 
-### Run server
+### Simple
 
 ```go
 engine := hippo.NewEngine(&SimpleServer{}, nil)
@@ -31,7 +34,7 @@ if err := engine.Start(); err != nil {
 }
 ```
 
-### Run server and log to STDOUT
+### Log to STDOUT
 
 ```go
 config := &hippo.Config{
@@ -43,7 +46,7 @@ if err := engine.Start(); err != nil {
 }
 ```
 
-### Run server and log to the file
+### Log to the file
 
 ```go
 func main() {
@@ -57,5 +60,3 @@ func main() {
 	}
 }
 ```
-
-
