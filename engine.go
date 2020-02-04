@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strings"
 	"syscall"
 	"time"
 )
@@ -22,13 +23,17 @@ type Engine struct {
 	ctx         context.Context
 	cancel      context.CancelFunc
 	errChan     chan error
+	Log         *logrus.Logger
 }
 
 // NewEngine allocates a new server to engine.
 func NewEngine(server Server, config *Config) *Engine {
 	ctx, cancel := context.WithCancel(context.Background())
+	//if config == nil {
+	//	config = newDefaultConfig()
+	//}
 	return &Engine{
-		processName: config.Name,
+		processName: strings.TrimSuffix(filepath.Base(os.Args[0]), filepath.Ext(os.Args[0])),
 		server:      server,
 		Config:      config,
 		started:     time.Now(),
@@ -39,12 +44,36 @@ func NewEngine(server Server, config *Config) *Engine {
 }
 
 func (e *Engine) init() error {
+	if err := e.initConfig(); err != nil {
+		return err
+	}
 	if err := e.initDirs(); err != nil {
 		return err
 	}
 	if err := e.initLogger(); err != nil {
 		return err
 	}
+	e.Log.Debug("logger has been initialized")
+	return nil
+}
+
+func (e *Engine) initConfig() error {
+	if e.Config == nil {
+		e.Config = NewDefaultConfig(e.processName)
+		return nil
+	}
+
+	config := NewDefaultConfig(e.processName)
+	if len(e.Config.Name) < 1 {
+		e.Config.Name = config.Name
+	}
+	if len(e.Config.DisplayName) < 1 {
+		e.Config.DisplayName = config.DisplayName
+	}
+	if len(e.Config.Description) < 1 {
+		e.Config.Description = config.Description
+	}
+
 	return nil
 }
 
@@ -58,24 +87,28 @@ func (e *Engine) initDirs() error {
 }
 
 func (e *Engine) initLogger() error {
-	logrus.SetFormatter(&logrus.TextFormatter{
-		ForceColors:   true,
-		DisableColors: true,
-	})
-
+	logger := logrus.New()
+	defer func() {
+		e.Log = logger
+	}()
 	if e.Config.Debug {
-		logrus.SetLevel(logrus.DebugLevel)
+		logger.SetLevel(logrus.DebugLevel)
 	}
-
 	if e.Config.Trace {
-		logrus.SetLevel(logrus.TraceLevel)
+		logger.SetLevel(logrus.TraceLevel)
 	}
-
-	if e.Config.Verbose {
-		logrus.SetOutput(os.Stdout)
+	if len(e.Config.LogDir) < 1 {
+		logger.SetFormatter(&logrus.TextFormatter{
+			ForceColors:   true,
+			FullTimestamp: true,
+		})
+		logger.SetOutput(os.Stdout)
 		return nil
 	}
 
+	logger.SetFormatter(&logrus.TextFormatter{
+		DisableColors: true,
+	})
 	logDir := e.workingDir
 	if len(e.Config.LogDir) > 0 {
 		dir, err := filepath.Abs(e.Config.LogDir)
@@ -92,7 +125,7 @@ func (e *Engine) initLogger() error {
 	if err != nil {
 		return err
 	}
-	logrus.SetOutput(file)
+	logger.SetOutput(file)
 	return nil
 }
 
@@ -102,39 +135,29 @@ func (e *Engine) Start() error {
 		return fmt.Errorf("failed to initialize hippo engine: %w", err)
 	}
 
-	e.server.SetEngine(e)
+	e.server.setEngine(e)
 	done := make(chan bool)
 	go func() {
-		defer func() {
-			done <- true
-		}()
-		logrus.Debug("1) engine has been started")
-		if err := e.server.Start(); err != nil {
-			e.errChan <- err
-			return
-		}
-		logrus.Debug("4) verified server no longer work")
-		e.errChan <- nil
+		e.Log.Debug("engine has been started")
+		e.errChan <- e.server.Start()
+		done <- true
 	}()
 	e.waitForSignals()
-	//logrus.Debug("waiting for done signal")
 	<-done
 
-	if err := e.server.Stop(); err != nil {
+	if err := e.stop(); err != nil {
 		return err
 	}
-
-	logrus.Debug("6) engine has been stopped")
 	return nil
 }
 
 // Stop stops engine.
-func (e *Engine) Stop() error {
+func (e *Engine) stop() error {
 	if err := e.server.Stop(); err != nil {
-		logrus.Error("failed to stop %s", e.processName)
+		e.Log.Error("failed to stop %s", e.processName)
 		return err
 	}
-	logrus.Debug("8) engine has been stopped")
+	e.Log.Debug("engine has been stopped")
 	return nil
 }
 
@@ -145,11 +168,11 @@ func (e *Engine) waitForSignals() {
 		select {
 		case err := <-e.errChan:
 			if err != nil {
-				logrus.Error(fmt.Errorf("server has stopped unintentionally: %w", err))
+				e.Log.Error(fmt.Errorf("server has stopped unintentionally: %w", err))
 			}
 			return
 		case <-ch:
-			logrus.Debug("received signal, shutting down..")
+			e.Log.Info("received signal, shutting down..")
 			e.cancel()
 		}
 	}
