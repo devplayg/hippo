@@ -4,7 +4,7 @@ Hippo is an easy, fast, lightweight server engine which supports gracefully shut
 
 ![Hippo](doc/hippo.png)
 
-### Struct
+## Struct
 
 ```go
 type SimpleServer struct {
@@ -20,7 +20,9 @@ func (s *SimpleServer) Stop() error {
 }
 ```
 
-### Run server
+## Run
+
+Run server
 
 ```go
 engine := hippo.NewEngine(&SimpleServer{}, nil)
@@ -29,12 +31,11 @@ if err := engine.Start(); err != nil {
 }
 ```
 
-### Run server and log to STDOUT
+Run server and log to STDOUT
 
 ```go
 config := &hippo.Config{
     Debug: true,
-    Trace: false,
 }
 engine := hippo.NewEngine(&SimpleServer{}, config)
 if err := engine.Start(); err != nil {
@@ -42,7 +43,7 @@ if err := engine.Start(); err != nil {
 }
 ```
 
-### Run server and log to the file
+Run server and log to the file
 
 ```go
 func main() {
@@ -56,4 +57,5 @@ func main() {
 	}
 }
 ```
+
 
