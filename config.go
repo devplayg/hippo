@@ -6,9 +6,9 @@ type Config struct {
 	DisplayName string
 	Description string
 	Version     string
-	IsService   bool
-	LogDir      string
-	Debug       bool
-	Trace       bool
-	Verbose     bool
+	//IsService   bool
+	LogDir  string
+	Debug   bool
+	Trace   bool
+	Verbose bool
 }

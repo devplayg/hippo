@@ -13,7 +13,7 @@ func main() {
 		Description: "simple server based on Hippo",
 		Version:     "1.0.1",
 		Debug:       true,
-		IsService:   true,
+		Verbose:     true,
 	}
 	engine := hippo.NewEngine(&SimpleServer{}, config)
 	if err := engine.Start(); err != nil {
@@ -26,32 +26,26 @@ type SimpleServer struct {
 }
 
 func (s *SimpleServer) Start() error {
+	log.Debug("2) server has been started")
+	// Do your job
+	interval := 2 * time.Second
+	for {
+		log.Debug("server is working on it")
+		time.Sleep(3 * time.Second)
+		//return errors.New("intentional error")
 
-	go func() {
-		//defer func() {
-		//}()
-		interval := 5 * time.Second
-		// Do work here
-		for {
-			log.Infof("Hello %s", s.engine.Config.Name)
-
-			select {
-			case <-s.engine.Ctx.Done():
-				s.engine.Done <- true
-				return
-
-			case <-time.After(interval):
-			}
+		select {
+		case <-s.engine.GetContext().Done():
+			log.Debug("3) canceled. server no longer works")
+			return nil
+		case <-time.After(interval):
 		}
-	}()
+	}
 	return nil
 }
 
 func (s *SimpleServer) Stop() error {
-	//log.Infof("%s stopped", s.engine.Config.Name)
-	//if s.engine.Config.IsService {
-	//	s.engine.Done<-true
-	//}
+	log.Debug("5) server has been stopped")
 	return nil
 }
 
