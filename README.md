@@ -22,7 +22,7 @@ func (s *SimpleServer) Stop() error {
 
 ## Run
 
-Run server
+### Run server
 
 ```go
 engine := hippo.NewEngine(&SimpleServer{}, nil)
@@ -31,7 +31,7 @@ if err := engine.Start(); err != nil {
 }
 ```
 
-Run server and log to STDOUT
+### Run server and log to STDOUT
 
 ```go
 config := &hippo.Config{
@@ -43,7 +43,7 @@ if err := engine.Start(); err != nil {
 }
 ```
 
-Run server and log to the file
+### Run server and log to the file
 
 ```go
 func main() {
