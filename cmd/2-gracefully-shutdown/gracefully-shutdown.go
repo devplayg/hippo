@@ -29,9 +29,12 @@ type SimpleServer struct {
 func (s *SimpleServer) Start() error {
 	s.Engine.Log.Debug("server has been started")
 
-	// Do your job
 	for {
+		// Do your job
 		s.Engine.Log.Info("server is working on it")
+
+		// intentional error
+		// return errors.New("intentional error")
 
 		select {
 		case <-s.Engine.GetContext().Done(): // for gracefully shutdown

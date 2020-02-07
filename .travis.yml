@@ -29,4 +29,4 @@ notifications:
 # .golangci.yml file at the top level of your repo.
 script:
   - go build ./cmd/1-simple/simple.go
-  - go build ./cmd/2-general/general.go
+  - go build ./cmd/2-gracefully-shutdown/gracefully-shutdown.go
