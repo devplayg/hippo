@@ -4,13 +4,13 @@ import (
 	"github.com/devplayg/hippo/v2"
 )
 
-//// Simple server
-//func main() {
-//	engine := hippo.NewEngine(&SimpleServer{}, nil)
-//	if err := engine.Start(); err != nil {
-//		panic(err)
-//	}
-//}
+// Simple server
+func main() {
+	engine := hippo.NewEngine(&SimpleServer{}, nil)
+	if err := engine.Start(); err != nil {
+		panic(err)
+	}
+}
 
 // Log to stdout
 //func main() {
@@ -25,16 +25,16 @@ import (
 //}
 
 // Log to file
-func main() {
-	config := &hippo.Config{
-		Debug:  true,
-		LogDir: ".",
-	}
-	engine := hippo.NewEngine(&SimpleServer{}, config)
-	if err := engine.Start(); err != nil {
-		panic(err)
-	}
-}
+// func main() {
+// 	config := &hippo.Config{
+// 		Debug:  true,
+// 		LogDir: ".",
+// 	}
+// 	engine := hippo.NewEngine(&SimpleServer{}, config)
+// 	if err := engine.Start(); err != nil {
+// 		panic(err)
+// 	}
+// }
 
 /*
 time="2020-02-04T15:40:09+09:00" level=info msg="server has been started"

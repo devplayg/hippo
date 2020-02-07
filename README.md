@@ -1,11 +1,9 @@
-# Hippo V2
+# hippo V2
 
-Hippo is an easy, fast, lightweight server engine which supports gracefully shutdown.
+The `hippo` is an easy, fast, lightweight server engine which supports gracefully shutdown.
 
 [![Build Status](https://travis-ci.org/devplayg/hippo.svg?branch=context)](https://travis-ci.org/devplayg/hippo)
 [![Go Report Card](https://goreportcard.com/badge/github.com/devplayg/hippo)](https://goreportcard.com/report/github.com/devplayg/hippo)
-
-- powered by Go, Logrus
 
 ![Hippo](hippo.png)
 
@@ -54,7 +52,7 @@ if err := engine.Start(); err != nil {
 ```go
 config := &hippo.Config{
     Debug:  true,
-    LogDir: ".",
+    LogDir: "/var/log/",
 }
 engine := hippo.NewEngine(&SimpleServer{}, config)
 if err := engine.Start(); err != nil {

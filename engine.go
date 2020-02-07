@@ -29,9 +29,6 @@ type Engine struct {
 // NewEngine allocates a new server to engine.
 func NewEngine(server Server, config *Config) *Engine {
 	ctx, cancel := context.WithCancel(context.Background())
-	//if config == nil {
-	//	config = newDefaultConfig()
-	//}
 	return &Engine{
 		processName: strings.TrimSuffix(filepath.Base(os.Args[0]), filepath.Ext(os.Args[0])),
 		server:      server,
@@ -59,11 +56,11 @@ func (e *Engine) init() error {
 
 func (e *Engine) initConfig() error {
 	if e.Config == nil {
-		e.Config = NewDefaultConfig(e.processName)
+		e.Config = newDefaultConfig(e.processName)
 		return nil
 	}
 
-	config := NewDefaultConfig(e.processName)
+	config := newDefaultConfig(e.processName)
 	if len(e.Config.Name) < 1 {
 		e.Config.Name = config.Name
 	}
@@ -115,7 +112,7 @@ func (e *Engine) initLogger() error {
 		if err != nil {
 			return fmt.Errorf("invalid log directory: %w", err)
 		}
-		if err := EnsureDir(logDir); err != nil {
+		if err := ensureDir(logDir); err != nil {
 			return fmt.Errorf("failed to create log directory: %w", err)
 		}
 		logDir = dir
@@ -184,4 +181,12 @@ func (e *Engine) GetContext() context.Context {
 
 func (e *Engine) GetWorkingDir() string {
 	return e.workingDir
+}
+
+func ensureDir(dir string) error {
+	if _, err := os.Stat(dir); os.IsExist(err) {
+		return nil
+	}
+
+	return os.MkdirAll(dir, os.ModePerm)
 }
