@@ -92,3 +92,16 @@ func (s *SimpleServer) Stop() error {
 	return nil
 }
 ```
+
+console output
+
+    DEBU[2020-02-08T07:16:41+09:00] logger has been initialized                  
+    DEBU[2020-02-08T07:16:41+09:00] engine has been started                      
+    DEBU[2020-02-08T07:16:41+09:00] server has been started                      
+    INFO[2020-02-08T07:16:41+09:00] server is working on it                      
+    INFO[2020-02-08T07:16:43+09:00] server is working on it                      
+    INFO[2020-02-08T07:16:45+09:00] server is working on it                      
+    INFO[2020-02-08T07:16:46+09:00] received signal, shutting down..             
+    DEBU[2020-02-08T07:16:46+09:00] server canceled; no longer works             
+    DEBU[2020-02-08T07:16:46+09:00] server has been stopped                      
+    DEBU[2020-02-08T07:16:46+09:00] engine has been stopped  
