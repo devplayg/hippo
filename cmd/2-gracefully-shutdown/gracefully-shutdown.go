@@ -14,19 +14,19 @@ func main() {
 		Debug:       true,
 		Trace:       false,
 	}
-	engine := hippo.NewEngine(&SimpleServer{}, config)
+	engine := hippo.NewEngine(&NormalServer{}, config)
 	if err := engine.Start(); err != nil {
 		panic(err)
 	}
 
 }
 
-type SimpleServer struct {
+type NormalServer struct {
 	// Launcher links servers and engines together.
 	hippo.Launcher // DO NOT REMOVE
 }
 
-func (s *SimpleServer) Start() error {
+func (s *NormalServer) Start() error {
 	s.Engine.Log.Debug("server has been started")
 
 	for {
@@ -45,7 +45,7 @@ func (s *SimpleServer) Start() error {
 	}
 }
 
-func (s *SimpleServer) Stop() error {
+func (s *NormalServer) Stop() error {
 	s.Engine.Log.Debug("server has been stopped")
 	return nil
 }
