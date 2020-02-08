@@ -76,10 +76,10 @@ func (e *Engine) initConfig() error {
 
 func (e *Engine) initDirs() error {
 	workingDir, err := filepath.Abs(os.Args[0])
-	e.workingDir = filepath.Dir(workingDir)
 	if err != nil {
 		return err
 	}
+	e.workingDir = filepath.Dir(workingDir)
 	return nil
 }
 
