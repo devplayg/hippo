@@ -7,7 +7,6 @@ import (
 // Hippo configuration struct
 type Config struct {
 	Name        string
-	DisplayName string
 	Description string
 	Version     string
 	LogDir      string
@@ -19,7 +18,6 @@ type Config struct {
 func newDefaultConfig(processName string) *Config {
 	return &Config{
 		Name:        processName,
-		DisplayName: processName,
 		Description: processName,
 		Version:     "unknown",
 		LogDir:      "",

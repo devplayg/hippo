@@ -64,9 +64,6 @@ func (e *Engine) initConfig() error {
 	if len(e.Config.Name) < 1 {
 		e.Config.Name = config.Name
 	}
-	if len(e.Config.DisplayName) < 1 {
-		e.Config.DisplayName = config.DisplayName
-	}
 	if len(e.Config.Description) < 1 {
 		e.Config.Description = config.Description
 	}

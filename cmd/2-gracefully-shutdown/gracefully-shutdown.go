@@ -7,8 +7,7 @@ import (
 
 func main() {
 	config := &hippo.Config{
-		Name:        "server",
-		DisplayName: "simple server",
+		Name:        "Simple Server",
 		Description: "simple server based on Hippo",
 		Version:     "2.0.0",
 		Debug:       true,
