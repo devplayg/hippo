@@ -23,7 +23,7 @@ type Engine struct {
 	ctx         context.Context
 	cancel      context.CancelFunc
 	errChan     chan error
-	Log         *logrus.Logger
+	log         *logrus.Logger
 }
 
 // NewEngine allocates a new server to engine.
@@ -50,7 +50,7 @@ func (e *Engine) init() error {
 	if err := e.initLogger(); err != nil {
 		return err
 	}
-	e.Log.Debug("logger has been initialized")
+	e.log.Debug("logger has been initialized")
 	return nil
 }
 
@@ -86,7 +86,7 @@ func (e *Engine) initDirs() error {
 func (e *Engine) initLogger() error {
 	logger := logrus.New()
 	defer func() {
-		e.Log = logger
+		e.log = logger
 	}()
 	if e.Config.Debug {
 		logger.SetLevel(logrus.DebugLevel)
@@ -132,10 +132,11 @@ func (e *Engine) Start() error {
 		return fmt.Errorf("failed to initialize hippo engine: %w", err)
 	}
 
+	e.log.Trace("engine starting")
 	e.server.setEngine(e)
 	done := make(chan bool)
 	go func() {
-		e.Log.Debug("engine has been started")
+		e.log.Debug("engine has been started")
 		e.errChan <- e.server.Start()
 		done <- true
 	}()
@@ -151,10 +152,10 @@ func (e *Engine) Start() error {
 // Stop stops engine.
 func (e *Engine) stop() error {
 	if err := e.server.Stop(); err != nil {
-		e.Log.Error("failed to stop %s", e.processName)
+		e.log.Error("failed to stop %s", e.processName)
 		return err
 	}
-	e.Log.Debug("engine has been stopped")
+	e.log.Debug("engine has been stopped")
 	return nil
 }
 
@@ -165,17 +166,17 @@ func (e *Engine) waitForSignals() {
 		select {
 		case err := <-e.errChan:
 			if err != nil {
-				e.Log.Error(fmt.Errorf("server has stopped unintentionally: %w", err))
+				e.log.Error(fmt.Errorf("server has stopped unintentionally: %w", err))
 			}
 			return
 		case <-ch:
-			e.Log.Info("received signal, shutting down..")
+			e.log.Info("received signal, shutting down..")
 			e.cancel()
 		}
 	}
 }
 
-func (e *Engine) GetContext() context.Context {
+func (e *Engine) getContext() context.Context {
 	return e.ctx
 }
 

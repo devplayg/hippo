@@ -8,7 +8,7 @@ The `hippo` is an easy, fast, lightweight server engine which supports gracefull
 ![Hippo](hippo.png)
 
 
-## Server struct
+## Simple server struct
 
 ```go
 type SimpleServer struct {
@@ -35,7 +35,7 @@ if err := engine.Start(); err != nil {
 }
 ```
 
-### Log to STDOUT
+### Debug
 
 ```go
 config := &hippo.Config{
@@ -63,45 +63,37 @@ if err := engine.Start(); err != nil {
 ## Gracefully shutdown
 
 ```go
-type SimpleServer struct {
-	// Launcher links servers and engines together.
+type NormalServer struct {
 	hippo.Launcher // DO NOT REMOVE
 }
 
-func (s *SimpleServer) Start() error {
-	s.Engine.Log.Debug("server has been started")
-
+func (s *NormalServer) Start() error {
 	for {
-		// Do your job
-		s.Engine.Log.Info("server is working on it")
+		s.Log.Info("server is working on it")
 
-		// intentional error
 		// return errors.New("intentional error")
 
 		select {
-		case <-s.Engine.GetContext().Done(): // for gracefully shutdown
-			s.Engine.Log.Debug("server canceled; no longer works")
+		case <-s.Done: // for gracefully shutdown
 			return nil
 		case <-time.After(2 * time.Second):
 		}
 	}
 }
 
-func (s *SimpleServer) Stop() error {
-	s.Engine.Log.Debug("server has been stopped")
+func (s *NormalServer) Stop() error {
 	return nil
 }
 ```
 
 console output
 
-    DEBU[2020-02-08T07:16:41+09:00] logger has been initialized                  
-    DEBU[2020-02-08T07:16:41+09:00] engine has been started                      
-    DEBU[2020-02-08T07:16:41+09:00] server has been started                      
-    INFO[2020-02-08T07:16:41+09:00] server is working on it                      
-    INFO[2020-02-08T07:16:43+09:00] server is working on it                      
-    INFO[2020-02-08T07:16:45+09:00] server is working on it                      
-    INFO[2020-02-08T07:16:46+09:00] received signal, shutting down..             
-    DEBU[2020-02-08T07:16:46+09:00] server canceled; no longer works             
-    DEBU[2020-02-08T07:16:46+09:00] server has been stopped                      
-    DEBU[2020-02-08T07:16:46+09:00] engine has been stopped  
+    DEBU[2020-02-12T10:23:00+09:00] logger has been initialized                  
+    DEBU[2020-02-12T10:23:00+09:00] engine has been started                      
+    DEBU[2020-02-12T10:23:00+09:00] server has been started                      
+    INFO[2020-02-12T10:23:00+09:00] server is working on it                      
+    INFO[2020-02-12T10:23:02+09:00] server is working on it                      
+    INFO[2020-02-12T10:23:03+09:00] received signal, shutting down..             
+    DEBU[2020-02-12T10:23:03+09:00] server canceled; no longer works             
+    DEBU[2020-02-12T10:23:03+09:00] server has been stopped                      
+    DEBU[2020-02-12T10:23:03+09:00] engine has been stopped 

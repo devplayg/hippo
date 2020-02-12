@@ -18,7 +18,6 @@ func main() {
 	if err := engine.Start(); err != nil {
 		panic(err)
 	}
-
 }
 
 type NormalServer struct {
@@ -27,18 +26,17 @@ type NormalServer struct {
 }
 
 func (s *NormalServer) Start() error {
-	s.Engine.Log.Debug("server has been started")
+	s.Log.Debug("server has been started")
 
 	for {
 		// Do your job
-		s.Engine.Log.Info("server is working on it")
+		s.Log.Info("server is working on it")
 
-		// intentional error
 		// return errors.New("intentional error")
 
 		select {
-		case <-s.Engine.GetContext().Done(): // for gracefully shutdown
-			s.Engine.Log.Debug("server canceled; no longer works")
+		case <-s.Done: // for gracefully shutdown
+			s.Log.Debug("server canceled; no longer works")
 			return nil
 		case <-time.After(2 * time.Second):
 		}
@@ -46,6 +44,6 @@ func (s *NormalServer) Start() error {
 }
 
 func (s *NormalServer) Stop() error {
-	s.Engine.Log.Debug("server has been stopped")
+	s.Log.Debug("server has been stopped")
 	return nil
 }
