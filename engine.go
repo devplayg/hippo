@@ -177,7 +177,7 @@ func (e *Engine) getContext() context.Context {
 	return e.ctx
 }
 
-func (e *Engine) GetWorkingDir() string {
+func (e *Engine) WorkingDir() string {
 	return e.workingDir
 }
 
