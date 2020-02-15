@@ -9,7 +9,7 @@ func main() {
 	config := &hippo.Config{
 		Name:        "Simple Server",
 		Description: "simple server based on Hippo",
-		Version:     "2.0.0",
+		Version:     "2.0",
 		Debug:       true,
 		Trace:       false,
 	}
@@ -20,8 +20,7 @@ func main() {
 }
 
 type NormalServer struct {
-	// Launcher links servers and engines together.
-	hippo.Launcher // DO NOT REMOVE
+	hippo.Launcher // DO NOT REMOVE; Launcher links servers and engines each other.
 }
 
 func (s *NormalServer) Start() error {

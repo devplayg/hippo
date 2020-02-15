@@ -2,10 +2,8 @@ package main
 
 import (
 	"context"
-	"errors"
 	"github.com/devplayg/hippo/v2"
 	"net/http"
-	"sync"
 	"time"
 )
 
@@ -28,61 +26,30 @@ type Server struct {
 }
 
 func (s *Server) Start() error {
-	wg := new(sync.WaitGroup)
-	wg.Add(1)
+	s.Log.Debug("server has been started")
+	ch := make(chan struct{})
 	go func() {
-		defer wg.Done()
-		if err := s.startServer1(); err != nil {
-			s.Log.Error(err)
-		}
-	}()
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		if err := s.startServer2(); err != nil {
-			s.Log.Error(err)
-		}
-	}()
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
 		if err := s.startHttpServer(); err != nil {
 			s.Log.Error(err)
 		}
+		close(ch)
 	}()
 
-	s.Log.Debug("all servers has been started")
-	wg.Wait()
-	return nil
-}
+	defer func() {
+		<-ch
+	}()
 
-func (s *Server) startServer1() error {
-	s.Log.Debug("server-1 has been started")
 	for {
-		s.Log.Info("server-1 is working on it")
-		select {
-		case <-s.Ctx.Done(): // for gracefully shutdown
-			s.Log.Debug("server-1 canceled; no longer works")
-			return nil
-		case <-time.After(2 * time.Second):
-		}
-	}
-}
+		// Do your job
+		s.Log.Info("server is working on it")
 
-func (s *Server) startServer2() error {
-	s.Log.Debug("server-2 has been started")
-	for {
-		s.Log.Info("server-2 is working on it")
-
-		// s.Cancel() // if you want to stop all server, uncomment this line
-		return errors.New("intentional error on server-2; no longer works" +
-			"")
+		// Intentional error
+		// s.Cancel() // send cancel signal to engine
+		// return errors.New("intentional error")
 
 		select {
 		case <-s.Ctx.Done(): // for gracefully shutdown
-			s.Log.Debug("server-2 canceled; no longer works")
+			s.Log.Debug("server canceled; no longer works")
 			return nil
 		case <-time.After(2 * time.Second):
 		}
@@ -111,6 +78,6 @@ func (s *Server) startHttpServer() error {
 }
 
 func (s *Server) Stop() error {
-	s.Log.Debug("all server has been stopped")
+	s.Log.Debug("server has been stopped")
 	return nil
 }

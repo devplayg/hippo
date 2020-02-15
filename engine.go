@@ -162,7 +162,7 @@ func (e *Engine) waitForSignals() {
 		select {
 		case err := <-e.errChan:
 			if err != nil {
-				e.log.Error(fmt.Errorf("server has stopped unintentionally: %w", err))
+				e.log.Error(fmt.Errorf("server has stopped: %w", err))
 			}
 			return
 		case <-ch:

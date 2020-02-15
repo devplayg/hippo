@@ -6,7 +6,7 @@ import (
 
 // Simple server
 func main() {
-	engine := hippo.NewEngine(&SimpleServer{}, nil)
+	engine := hippo.NewEngine(&SimpleServer{}, &hippo.Config{Debug: true})
 	if err := engine.Start(); err != nil {
 		panic(err)
 	}
@@ -37,15 +37,15 @@ func main() {
 //}
 
 type SimpleServer struct {
-	hippo.Launcher // DO NOT REMOVE; links servers and engines each other.
+	hippo.Launcher // DO NOT REMOVE; Launcher links servers and engines each other.
 }
 
 func (s *SimpleServer) Start() error {
-	s.Log.Info("server has been started")
+	s.Log.Debug("server has been started")
 	return nil
 }
 
 func (s *SimpleServer) Stop() error {
-	s.Log.Info("server has been stopped")
+	s.Log.Debug("server has been stopped")
 	return nil
 }
