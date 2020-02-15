@@ -44,10 +44,12 @@ func (s *Server) Start() error {
 		// Do your job
 		s.Log.Info("server is working on it")
 
+		time.Sleep(3 * time.Second)
+		// s.Cancel()
 		// return errors.New("intentional error")
 
 		select {
-		case <-s.Done: // for gracefully shutdown
+		case <-s.Ctx.Done(): // for gracefully shutdown
 			s.Log.Debug("server canceled; no longer works")
 			return nil
 		case <-time.After(2 * time.Second):
@@ -68,8 +70,7 @@ func (s *Server) startWebServer() error {
 
 	ch := make(chan struct{})
 	go func() {
-		<-s.Done
-		//s.Log.Info("done ???")
+		<-s.Ctx.Done()
 		if err := srv.Shutdown(context.Background()); err != nil {
 			s.Log.Error(err)
 		}
@@ -80,7 +81,7 @@ func (s *Server) startWebServer() error {
 	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
 		s.Log.Fatalf("HTTP server ListenAndServe: %v", err)
 	}
-	s.Log.Info("HTTP server has been stopped")
 	<-ch
+	s.Log.Info("HTTP server has been stopped")
 	return nil
 }

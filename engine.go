@@ -50,7 +50,6 @@ func (e *Engine) init() error {
 	if err := e.initLogger(); err != nil {
 		return err
 	}
-	e.log.Debug("logger has been initialized")
 	return nil
 }
 
@@ -173,7 +172,7 @@ func (e *Engine) waitForSignals() {
 	}
 }
 
-func (e *Engine) getContext() context.Context {
+func (e *Engine) context() context.Context {
 	return e.ctx
 }
 

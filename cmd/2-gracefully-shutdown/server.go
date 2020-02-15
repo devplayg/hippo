@@ -34,7 +34,7 @@ func (s *NormalServer) Start() error {
 		// return errors.New("intentional error")
 
 		select {
-		case <-s.Done: // for gracefully shutdown
+		case <-s.Ctx.Done(): // for gracefully shutdown
 			s.Log.Debug("server canceled; no longer works")
 			return nil
 		case <-time.After(2 * time.Second):
