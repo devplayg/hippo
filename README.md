@@ -5,7 +5,7 @@ The `hippo` is an easy, fast, lightweight server engine which supports gracefull
 [![Build Status](https://travis-ci.org/devplayg/hippo.svg?branch=master)](https://travis-ci.org/devplayg/hippo)
 [![Go Report Card](https://goreportcard.com/badge/github.com/devplayg/hippo)](https://goreportcard.com/report/github.com/devplayg/hippo)
 
-![Hippo](hippo.png)
+![Hippo](hippo-v2.png)
 
 Import it in your program as:
 
