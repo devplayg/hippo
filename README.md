@@ -7,6 +7,11 @@ The `hippo` is an easy, fast, lightweight server engine which supports gracefull
 
 ![Hippo](hippo.png)
 
+Import it in your program as:
+
+```go
+import "github.com/devplayg/hippo/v2"
+```
 
 ## Simple server 
 
