@@ -70,30 +70,30 @@ Shutting down the server gracefully
 
 ```go
 type NormalServer struct {
-	hippo.Launcher // DO NOT REMOVE; Launcher links servers and engines each other.
+    hippo.Launcher // DO NOT REMOVE; Launcher links servers and engines each other.
 }
 
 func (s *NormalServer) Start() error {
-	s.Log.Debug("server has been started")
+    s.Log.Debug("server has been started")
 
-	for {
-		// Do your job
-		s.Log.Info("server is working on it")
+    for {
+        // Do your job
+        s.Log.Info("server is working on it")
 
-		// return errors.New("intentional error")
+        // return errors.New("intentional error")
 
-		select {
-		case <-s.Ctx.Done(): // for gracefully shutdown
-			s.Log.Debug("server canceled; no longer works")
-			return nil
-		case <-time.After(2 * time.Second):
-		}
-	}
+        select {
+        case <-s.Ctx.Done(): // for gracefully shutdown
+            s.Log.Debug("server canceled; no longer works")
+            return nil
+        case <-time.After(2 * time.Second):
+        }
+    }
 }
 
 func (s *NormalServer) Stop() error {
-	s.Log.Debug("server has been stopped")
-	return nil
+    s.Log.Debug("server has been stopped")
+    return nil
 }
 ```
 
@@ -116,64 +116,64 @@ Shutting down the server including HTTP server
 
 ```go
 type Server struct {
-	hippo.Launcher // DO NOT REMOVE; Launcher links servers and engines each other.
+    hippo.Launcher // DO NOT REMOVE; Launcher links servers and engines each other.
 }
 
 func (s *Server) Start() error {
-	s.Log.Debug("server has been started")
-	ch := make(chan struct{})
-	go func() {
-		if err := s.startHttpServer(); err != nil {
-			s.Log.Error(err)
-		}
-		close(ch)
-	}()
+    s.Log.Debug("server has been started")
+    ch := make(chan struct{})
+    go func() {
+        if err := s.startHttpServer(); err != nil {
+            s.Log.Error(err)
+        }
+        close(ch)
+    }()
 
-	defer func() {
-		<-ch
-	}()
+    defer func() {
+        <-ch
+    }()
 
-	for {
-		// Do your job
-		s.Log.Info("server is working on it")
+    for {
+        // Do your job
+        s.Log.Info("server is working on it")
 
-		// Intentional error
-		// s.Cancel() // send cancel signal to engine
-		// return errors.New("intentional error")
+        // Intentional error
+        // s.Cancel() // send cancel signal to engine
+        // return errors.New("intentional error")
 
-		select {
-		case <-s.Ctx.Done(): // for gracefully shutdown
-			s.Log.Debug("server canceled; no longer works")
-			return nil
-		case <-time.After(2 * time.Second):
-		}
-	}
+        select {
+        case <-s.Ctx.Done(): // for gracefully shutdown
+            s.Log.Debug("server canceled; no longer works")
+            return nil
+        case <-time.After(2 * time.Second):
+        }
+    }
 }
 
 func (s *Server) startHttpServer() error {
-	var srv http.Server
+    var srv http.Server
 
-	ch := make(chan struct{})
-	go func() {
-		<-s.Ctx.Done()
-		if err := srv.Shutdown(context.Background()); err != nil {
-			s.Log.Error(err)
-		}
-		close(ch)
-	}()
+    ch := make(chan struct{})
+    go func() {
+        <-s.Ctx.Done()
+        if err := srv.Shutdown(context.Background()); err != nil {
+            s.Log.Error(err)
+        }
+        close(ch)
+    }()
 
-	s.Log.Debug("HTTP server has been started")
-	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
-		s.Log.Fatalf("HTTP server ListenAndServe: %v", err)
-	}
-	<-ch
-	s.Log.Debug("HTTP server has been stopped")
-	return nil
+    s.Log.Debug("HTTP server has been started")
+    if err := srv.ListenAndServe(); err != http.ErrServerClosed {
+        s.Log.Fatalf("HTTP server ListenAndServe: %v", err)
+    }
+    <-ch
+    s.Log.Debug("HTTP server has been stopped")
+    return nil
 }
 
 func (s *Server) Stop() error {
-	s.Log.Debug("server has been stopped")
-	return nil
+    s.Log.Debug("server has been stopped")
+    return nil
 }
 ```
 
@@ -197,95 +197,95 @@ Shutting down multiple servers gracefully
 
 ```go
 type Server struct {
-	hippo.Launcher // DO NOT REMOVE; Launcher links servers and engines each other.
+    hippo.Launcher // DO NOT REMOVE; Launcher links servers and engines each other.
 }
 
 func (s *Server) Start() error {
-	wg := new(sync.WaitGroup)
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		if err := s.startServer1(); err != nil {
-			s.Log.Error(err)
-		}
-	}()
+    wg := new(sync.WaitGroup)
+    wg.Add(1)
+    go func() {
+        defer wg.Done()
+        if err := s.startServer1(); err != nil {
+            s.Log.Error(err)
+        }
+    }()
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		if err := s.startServer2(); err != nil {
-			s.Log.Error(err)
-		}
-	}()
+    wg.Add(1)
+    go func() {
+        defer wg.Done()
+        if err := s.startServer2(); err != nil {
+            s.Log.Error(err)
+        }
+    }()
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		if err := s.startHttpServer(); err != nil {
-			s.Log.Error(err)
-		}
-	}()
+    wg.Add(1)
+    go func() {
+        defer wg.Done()
+        if err := s.startHttpServer(); err != nil {
+            s.Log.Error(err)
+        }
+    }()
 
-	s.Log.Debug("all servers has been started")
-	wg.Wait()
-	return nil
+    s.Log.Debug("all servers has been started")
+    wg.Wait()
+    return nil
 }
 
 func (s *Server) startServer1() error {
-	s.Log.Debug("server-1 has been started")
-	for {
-		s.Log.Info("server-1 is working on it")
-		select {
-		case <-s.Ctx.Done(): // for gracefully shutdown
-			s.Log.Debug("server-1 canceled; no longer works")
-			return nil
-		case <-time.After(2 * time.Second):
-		}
-	}
+    s.Log.Debug("server-1 has been started")
+    for {
+        s.Log.Info("server-1 is working on it")
+        select {
+        case <-s.Ctx.Done(): // for gracefully shutdown
+            s.Log.Debug("server-1 canceled; no longer works")
+            return nil
+        case <-time.After(2 * time.Second):
+        }
+    }
 }
 
 func (s *Server) startServer2() error {
-	s.Log.Debug("server-2 has been started")
-	for {
-		s.Log.Info("server-2 is working on it")
+    s.Log.Debug("server-2 has been started")
+    for {
+        s.Log.Info("server-2 is working on it")
 
-		// s.Cancel() // if you want to stop all server, uncomment this line
-		return errors.New("intentional error on server-2; no longer works" +
-			"")
+        // s.Cancel() // if you want to stop all server, uncomment this line
+        return errors.New("intentional error on server-2; no longer works" +
+            "")
 
-		select {
-		case <-s.Ctx.Done(): // for gracefully shutdown
-			s.Log.Debug("server-2 canceled; no longer works")
-			return nil
-		case <-time.After(2 * time.Second):
-		}
-	}
+        select {
+        case <-s.Ctx.Done(): // for gracefully shutdown
+            s.Log.Debug("server-2 canceled; no longer works")
+            return nil
+        case <-time.After(2 * time.Second):
+        }
+    }
 }
 
 func (s *Server) startHttpServer() error {
-	var srv http.Server
+    var srv http.Server
 
-	ch := make(chan struct{})
-	go func() {
-		<-s.Ctx.Done()
-		if err := srv.Shutdown(context.Background()); err != nil {
-			s.Log.Error(err)
-		}
-		close(ch)
-	}()
+    ch := make(chan struct{})
+    go func() {
+        <-s.Ctx.Done()
+        if err := srv.Shutdown(context.Background()); err != nil {
+            s.Log.Error(err)
+        }
+        close(ch)
+    }()
 
-	s.Log.Debug("HTTP server has been started")
-	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
-		s.Log.Fatalf("HTTP server ListenAndServe: %v", err)
-	}
-	<-ch
-	s.Log.Debug("HTTP server has been stopped")
-	return nil
+    s.Log.Debug("HTTP server has been started")
+    if err := srv.ListenAndServe(); err != http.ErrServerClosed {
+        s.Log.Fatalf("HTTP server ListenAndServe: %v", err)
+    }
+    <-ch
+    s.Log.Debug("HTTP server has been stopped")
+    return nil
 }
 
 func (s *Server) Stop() error {
-	s.Log.Debug("all server has been stopped")
-	return nil
+    s.Log.Debug("all server has been stopped")
+    return nil
 }
 ```
 
