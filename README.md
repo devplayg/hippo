@@ -250,8 +250,7 @@ func (s *Server) startServer2() error {
         s.Log.Info("server-2 is working on it")
 
         // s.Cancel() // if you want to stop all server, uncomment this line
-        return errors.New("intentional error on server-2; no longer works" +
-            "")
+        return errors.New("intentional error on server-2; no longer works")
 
         select {
         case <-s.Ctx.Done(): // for gracefully shutdown
