@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"errors"
 	"github.com/devplayg/hippo/v2"
 	"net/http"
+	"sync"
 	"time"
 )
 
@@ -11,7 +13,7 @@ func main() {
 	config := &hippo.Config{
 		Name:        "Simple Server",
 		Description: "simple server based on Hippo",
-		Version:     "2.0.0",
+		Version:     "2.0",
 		Debug:       true,
 		Trace:       false,
 	}
@@ -27,45 +29,64 @@ type Server struct {
 }
 
 func (s *Server) Start() error {
-	s.Log.Debug("server has been started")
-	ch := make(chan struct{})
+	wg := new(sync.WaitGroup)
+	wg.Add(1)
 	go func() {
-		if err := s.startWebServer(); err != nil {
+		defer wg.Done()
+		if err := s.startServer1(); err != nil {
 			s.Log.Error(err)
 		}
-		close(ch)
 	}()
 
-	defer func() {
-		<-ch
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if err := s.startServer2(); err != nil {
+			s.Log.Error(err)
+		}
 	}()
 
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if err := s.startHttpServer(); err != nil {
+			s.Log.Error(err)
+		}
+	}()
+
+	s.Log.Info("all servers has been started")
+	wg.Wait()
+	return nil
+}
+
+func (s *Server) startServer1() error {
+	s.Log.Debug("server-1 has been started")
 	for {
-		// Do your job
-		s.Log.Info("server is working on it")
-
-		time.Sleep(3 * time.Second)
-		// s.Cancel()
-		// return errors.New("intentional error")
-
+		s.Log.Info("server-1 is working on it")
+		return errors.New("asdfasd")
 		select {
 		case <-s.Ctx.Done(): // for gracefully shutdown
-			s.Log.Debug("server canceled; no longer works")
+			s.Log.Debug("server-1 canceled; no longer works")
 			return nil
 		case <-time.After(2 * time.Second):
 		}
 	}
-
-	return nil
-
 }
 
-func (s *Server) Stop() error {
-	s.Log.Debug("server has been stopped")
-	return nil
+func (s *Server) startServer2() error {
+	s.Log.Debug("server-2 has been started")
+	for {
+		s.Log.Info("server-2 is working on it")
+		select {
+		case <-s.Ctx.Done(): // for gracefully shutdown
+			s.Log.Debug("server-2 canceled; no longer works")
+			return nil
+		case <-time.After(2 * time.Second):
+		}
+	}
 }
 
-func (s *Server) startWebServer() error {
+func (s *Server) startHttpServer() error {
 	var srv http.Server
 
 	ch := make(chan struct{})
@@ -77,11 +98,16 @@ func (s *Server) startWebServer() error {
 		close(ch)
 	}()
 
-	s.Log.Info("HTTP server is about to start")
+	s.Log.Info("HTTP server has been started")
 	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
 		s.Log.Fatalf("HTTP server ListenAndServe: %v", err)
 	}
 	<-ch
 	s.Log.Info("HTTP server has been stopped")
+	return nil
+}
+
+func (s *Server) Stop() error {
+	s.Log.Debug("all server has been stopped")
 	return nil
 }

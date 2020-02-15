@@ -176,10 +176,6 @@ func (e *Engine) context() context.Context {
 	return e.ctx
 }
 
-func (e *Engine) WorkingDir() string {
-	return e.workingDir
-}
-
 func ensureDir(dir string) error {
 	if _, err := os.Stat(dir); os.IsExist(err) {
 		return nil

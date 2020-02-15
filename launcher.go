@@ -6,10 +6,11 @@ import (
 )
 
 type Launcher struct {
-	Engine *Engine
-	Log    *logrus.Logger
-	Ctx    context.Context
-	Cancel context.CancelFunc
+	Engine     *Engine
+	Log        *logrus.Logger
+	Ctx        context.Context
+	Cancel     context.CancelFunc
+	WorkingDir string
 }
 
 func (l *Launcher) setEngine(e *Engine) {
@@ -17,4 +18,5 @@ func (l *Launcher) setEngine(e *Engine) {
 	l.Log = e.log
 	l.Ctx = e.context()
 	l.Cancel = e.cancel
+	l.WorkingDir = e.workingDir
 }
