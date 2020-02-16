@@ -40,7 +40,7 @@ func (s *Server) Start() error {
 	}()
 
 	for {
-		// Do your job
+		// Do your repetitive jobs
 		s.Log.Info("server is working on it")
 
 		// Intentional error

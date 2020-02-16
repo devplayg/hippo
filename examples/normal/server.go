@@ -27,9 +27,10 @@ func (s *NormalServer) Start() error {
 	s.Log.Debug("server has been started")
 
 	for {
-		// Do your job
+		// Do your repetitive jobs
 		s.Log.Info("server is working on it")
 
+		// Intentional error
 		// return errors.New("intentional error")
 
 		select {

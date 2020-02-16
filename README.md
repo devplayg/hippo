@@ -5,7 +5,7 @@ The `hippo` is an easy, fast, lightweight server engine which supports gracefull
 [![Build Status](https://travis-ci.org/devplayg/hippo.svg?branch=master)](https://travis-ci.org/devplayg/hippo)
 [![Go Report Card](https://goreportcard.com/badge/github.com/devplayg/hippo)](https://goreportcard.com/report/github.com/devplayg/hippo)
 
-![Hippo](hippo-v2.png)
+![Hippo](hippo.png)
 
 Import it in your program as:
 
@@ -17,7 +17,7 @@ import "github.com/devplayg/hippo/v2"
 
 ```go
 type SimpleServer struct {
-    hippo.Launcher // DO NOT REMOVE; Launcher links servers and engines each other.
+    hippo.Launcher // DO NOT REMOVE; Launcher links servers and engine each other.
 }
 
 func (s *SimpleServer) Start() error {
@@ -70,16 +70,17 @@ Shutting down the server gracefully
 
 ```go
 type NormalServer struct {
-    hippo.Launcher // DO NOT REMOVE; Launcher links servers and engines each other.
+    hippo.Launcher // DO NOT REMOVE; Launcher links servers and engine each other.
 }
 
 func (s *NormalServer) Start() error {
     s.Log.Debug("server has been started")
 
     for {
-        // Do your job
+        // Do your repetitive jobs
         s.Log.Info("server is working on it")
 
+        // Intentional error
         // return errors.New("intentional error")
 
         select {
@@ -116,7 +117,7 @@ Shutting down the server including HTTP server
 
 ```go
 type Server struct {
-    hippo.Launcher // DO NOT REMOVE; Launcher links servers and engines each other.
+    hippo.Launcher // DO NOT REMOVE; Launcher links servers and engine each other.
 }
 
 func (s *Server) Start() error {
@@ -134,7 +135,7 @@ func (s *Server) Start() error {
     }()
 
     for {
-        // Do your job
+        // Do your repetitive jobs
         s.Log.Info("server is working on it")
 
         // Intentional error
@@ -197,38 +198,42 @@ Shutting down multiple servers gracefully
 
 ```go
 type Server struct {
-    hippo.Launcher // DO NOT REMOVE; Launcher links servers and engines each other.
+    hippo.Launcher // DO NOT REMOVE; Launcher links servers and engine each other.
 }
 
 func (s *Server) Start() error {
-    wg := new(sync.WaitGroup)
-    wg.Add(1)
-    go func() {
-        defer wg.Done()
-        if err := s.startServer1(); err != nil {
-            s.Log.Error(err)
-        }
-    }()
+	wg := new(sync.WaitGroup)
 
-    wg.Add(1)
-    go func() {
-        defer wg.Done()
-        if err := s.startServer2(); err != nil {
-            s.Log.Error(err)
-        }
-    }()
+	// Server 1
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if err := s.startServer1(); err != nil {
+			s.Log.Error(err)
+		}
+	}()
 
-    wg.Add(1)
-    go func() {
-        defer wg.Done()
-        if err := s.startHttpServer(); err != nil {
-            s.Log.Error(err)
-        }
-    }()
+	// Server 2
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if err := s.startServer2(); err != nil {
+			s.Log.Error(err)
+		}
+	}()
 
-    s.Log.Debug("all servers has been started")
-    wg.Wait()
-    return nil
+	// Server 3
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if err := s.startHttpServer(); err != nil {
+			s.Log.Error(err)
+		}
+	}()
+
+	s.Log.Debug("all servers has been started")
+	wg.Wait()
+	return nil
 }
 
 func (s *Server) startServer1() error {

@@ -29,6 +29,8 @@ type Server struct {
 
 func (s *Server) Start() error {
 	wg := new(sync.WaitGroup)
+
+	// Server 1
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
@@ -37,6 +39,7 @@ func (s *Server) Start() error {
 		}
 	}()
 
+	// Server 2
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
@@ -45,6 +48,7 @@ func (s *Server) Start() error {
 		}
 	}()
 
+	// Server 3
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
