@@ -9,7 +9,7 @@ func main() {
 	config := &hippo.Config{
 		Name:        "Simple Server",
 		Description: "simple server based on Hippo",
-		Version:     "2.0",
+		Version:     "2.1",
 		Debug:       true,
 		Trace:       false,
 	}
