@@ -1,6 +1,6 @@
 # hippo
 
-The `hippo` is an easy, fast, lightweight server engine which supports gracefully shutting down.
+The `hippo` is an easy, fast, lightweight engine which supports gracefully shutting down the servers.
 
 [![Build Status](https://travis-ci.org/devplayg/hippo.svg?branch=master)](https://travis-ci.org/devplayg/hippo)
 [![Go Report Card](https://goreportcard.com/badge/github.com/devplayg/hippo)](https://goreportcard.com/report/github.com/devplayg/hippo)
