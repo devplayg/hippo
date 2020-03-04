@@ -60,7 +60,7 @@ func (s *Server) run() error {
 	ch := make(chan bool, s.workerCount)
 
 	for {
-		tasks := getTasks()
+		tasks, _ := s.getTasks()
 		s.Log.Debugf("got %d tasks", len(tasks))
 
 		err := s.distributeTasks(tasks, ch)
@@ -129,12 +129,11 @@ func (s *Server) handleTask(task string) error {
 	return nil
 }
 
-// Task generator
-func getTasks() []string {
+func (s *Server) getTasks() ([]string, error) {
 	tasks := make([]string, 0)
 	for i := 0; i < rand.Intn(10); i++ {
 		tasks = append(tasks, fmt.Sprintf("task-%d", taskId))
 		taskId++
 	}
-	return tasks
+	return tasks, nil
 }
