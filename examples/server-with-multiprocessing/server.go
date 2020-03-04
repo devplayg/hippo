@@ -2,10 +2,10 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/devplayg/hippo/v2"
 	"math/rand"
-	"strings"
 	"sync/atomic"
 	"time"
 )
@@ -66,7 +66,7 @@ func (s *Server) run() error {
 		err := s.distributeTasks(tasks, ch)
 		if err != nil {
 			// is error from context canceled?
-			if strings.Contains(err.Error(), context.Canceled.Error()) {
+			if errors.Is(err, context.Canceled) {
 				return nil
 			}
 			return err
