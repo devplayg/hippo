@@ -115,68 +115,7 @@ console output
 
 Shutting down the server including HTTP server
 
-```go
-type Server struct {
-    hippo.Launcher // DO NOT REMOVE; Launcher links servers and engine each other.
-}
-
-func (s *Server) Start() error {
-    s.Log.Debug("server has been started")
-    ch := make(chan struct{})
-    go func() {
-        if err := s.startHttpServer(); err != nil {
-            s.Log.Error(err)
-        }
-        close(ch)
-    }()
-
-    defer func() {
-        <-ch
-    }()
-
-    for {
-        // Do your repetitive jobs
-        s.Log.Info("server is working on it")
-
-        // Intentional error
-        // s.Cancel() // send cancel signal to engine
-        // return errors.New("intentional error")
-
-        select {
-        case <-s.Ctx.Done(): // for gracefully shutdown
-            s.Log.Debug("server canceled; no longer works")
-            return nil
-        case <-time.After(2 * time.Second):
-        }
-    }
-}
-
-func (s *Server) startHttpServer() error {
-    var srv http.Server
-
-    ch := make(chan struct{})
-    go func() {
-        <-s.Ctx.Done()
-        if err := srv.Shutdown(context.Background()); err != nil {
-            s.Log.Error(err)
-        }
-        close(ch)
-    }()
-
-    s.Log.Debug("HTTP server has been started")
-    if err := srv.ListenAndServe(); err != http.ErrServerClosed {
-        s.Log.Fatalf("HTTP server ListenAndServe: %v", err)
-    }
-    <-ch
-    s.Log.Debug("HTTP server has been stopped")
-    return nil
-}
-
-func (s *Server) Stop() error {
-    s.Log.Debug("server has been stopped")
-    return nil
-}
-```
+https://github.com/devplayg/hippo/blob/master/examples/normal-http-server/server.go
 
 Console output
 
@@ -190,108 +129,59 @@ Console output
     DEBU[2020-02-16T07:45:40+09:00] server canceled; no longer works             
     DEBU[2020-02-16T07:45:40+09:00] HTTP server has been stopped                 
     DEBU[2020-02-16T07:45:40+09:00] server has been stopped                      
-    DEBU[2020-02-16T07:45:40+09:00] engine has been stopped    
+    DEBU[2020-02-16T07:45:40+09:00] engine has been stopped
+    
+## Server with multiprocessing
+
+Shutting down server with multiprocessing
+
+https://github.com/devplayg/hippo/blob/master/examples/server-with-multiprocessing/server.go
+
+Console output
+
+    time="2020-03-04T15:16:55+09:00" level=debug msg="engine has been started"
+    time="2020-03-04T15:16:55+09:00" level=debug msg="server has been started"
+    time="2020-03-04T15:16:55+09:00" level=debug msg="8 workers are ready"
+    time="2020-03-04T15:16:55+09:00" level=debug msg="got 3 tasks"
+    time="2020-03-04T15:16:55+09:00" level=debug msg="working task-0"
+    time="2020-03-04T15:16:55+09:00" level=debug msg="working task-1"
+    time="2020-03-04T15:16:55+09:00" level=debug msg="working task-2"
+    time="2020-03-04T15:16:56+09:00" level=debug msg="got 6 tasks"
+    time="2020-03-04T15:16:56+09:00" level=debug msg="working task-3"
+    time="2020-03-04T15:16:56+09:00" level=debug msg="working task-4"
+    time="2020-03-04T15:16:56+09:00" level=debug msg="done task-4"
+    time="2020-03-04T15:16:56+09:00" level=debug msg="working task-5"
+    time="2020-03-04T15:16:56+09:00" level=debug msg="working task-6"
+    time="2020-03-04T15:16:56+09:00" level=debug msg="working task-7"
+    time="2020-03-04T15:16:56+09:00" level=debug msg="working task-8"
+    time="2020-03-04T15:16:57+09:00" level=debug msg="done task-3"
+    time="2020-03-04T15:16:57+09:00" level=debug msg="done task-5"
+    time="2020-03-04T15:16:57+09:00" level=debug msg="got 6 tasks"
+    time="2020-03-04T15:16:57+09:00" level=debug msg="working task-9"
+    time="2020-03-04T15:16:57+09:00" level=debug msg="working task-10"
+    time="2020-03-04T15:16:58+09:00" level=debug msg="done task-10"
+    time="2020-03-04T15:16:58+09:00" level=debug msg="working task-11"
+    time="2020-03-04T15:16:59+09:00" level=info msg="received signal, shutting down.."
+    time="2020-03-04T15:16:59+09:00" level=debug msg="done task-1"
+    time="2020-03-04T15:16:59+09:00" level=debug msg="waiting for working 7 workers"
+    time="2020-03-04T15:16:59+09:00" level=debug msg="working task-12"
+    time="2020-03-04T15:16:59+09:00" level=debug msg="done task-2"
+    time="2020-03-04T15:17:02+09:00" level=debug msg="done task-0"
+    time="2020-03-04T15:17:03+09:00" level=debug msg="done task-7"
+    time="2020-03-04T15:17:04+09:00" level=debug msg="done task-9"
+    time="2020-03-04T15:17:05+09:00" level=debug msg="done task-6"
+    time="2020-03-04T15:17:05+09:00" level=debug msg="done task-8"
+    time="2020-03-04T15:17:07+09:00" level=debug msg="done task-12"
+    time="2020-03-04T15:17:07+09:00" level=debug msg="done task-11"
+    time="2020-03-04T15:17:07+09:00" level=debug msg="works of all workers are over"
+    time="2020-03-04T15:17:07+09:00" level=debug msg="server has been stopped"
+    time="2020-03-04T15:17:07+09:00" level=debug msg="engine has been stopped"    
 
 ## Multiple servers
 
 Shutting down multiple servers gracefully
 
-```go
-type Server struct {
-    hippo.Launcher // DO NOT REMOVE; Launcher links servers and engine each other.
-}
-
-func (s *Server) Start() error {
-	wg := new(sync.WaitGroup)
-
-	// Server 1
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		if err := s.startServer1(); err != nil {
-			s.Log.Error(err)
-		}
-	}()
-
-	// Server 2
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		if err := s.startServer2(); err != nil {
-			s.Log.Error(err)
-		}
-	}()
-
-	// Server 3
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		if err := s.startHttpServer(); err != nil {
-			s.Log.Error(err)
-		}
-	}()
-
-	s.Log.Debug("all servers has been started")
-	wg.Wait()
-	return nil
-}
-
-func (s *Server) startServer1() error {
-    s.Log.Debug("server-1 has been started")
-    for {
-        s.Log.Info("server-1 is working on it")
-        select {
-        case <-s.Ctx.Done(): // for gracefully shutdown
-            s.Log.Debug("server-1 canceled; no longer works")
-            return nil
-        case <-time.After(2 * time.Second):
-        }
-    }
-}
-
-func (s *Server) startServer2() error {
-    s.Log.Debug("server-2 has been started")
-    for {
-        s.Log.Info("server-2 is working on it")
-
-        // s.Cancel() // if you want to stop all server, uncomment this line
-        return errors.New("intentional error on server-2; no longer works")
-
-        select {
-        case <-s.Ctx.Done(): // for gracefully shutdown
-            s.Log.Debug("server-2 canceled; no longer works")
-            return nil
-        case <-time.After(2 * time.Second):
-        }
-    }
-}
-
-func (s *Server) startHttpServer() error {
-    var srv http.Server
-
-    ch := make(chan struct{})
-    go func() {
-        <-s.Ctx.Done()
-        if err := srv.Shutdown(context.Background()); err != nil {
-            s.Log.Error(err)
-        }
-        close(ch)
-    }()
-
-    s.Log.Debug("HTTP server has been started")
-    if err := srv.ListenAndServe(); err != http.ErrServerClosed {
-        s.Log.Fatalf("HTTP server ListenAndServe: %v", err)
-    }
-    <-ch
-    s.Log.Debug("HTTP server has been stopped")
-    return nil
-}
-
-func (s *Server) Stop() error {
-    s.Log.Debug("all server has been stopped")
-    return nil
-}
-```
+https://github.com/devplayg/hippo/blob/master/examples/normal-multiple/server.go
 
 Console output
 

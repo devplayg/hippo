@@ -93,7 +93,7 @@ func (e *Engine) initLogger() error {
 	if len(e.Config.LogDir) < 1 {
 		logger.SetFormatter(&logrus.TextFormatter{
 			ForceColors:   true,
-			FullTimestamp: true,
+			DisableColors: true,
 		})
 		logger.SetOutput(os.Stdout)
 		return nil

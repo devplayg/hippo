@@ -31,3 +31,4 @@ script:
   - go build examples/simple/server.go
   - go build examples/normal/server.go
   - go build examples/normal-multiple/server.go
+  - go build examples/server-with-multiprocessing/server.go
