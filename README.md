@@ -13,7 +13,7 @@ Import it in your program as:
 import "github.com/devplayg/hippo/v2"
 ```
 
-## Simple server 
+## 1. Simple server 
 
 ```go
 type SimpleServer struct {
@@ -64,7 +64,7 @@ if err := engine.Start(); err != nil {
 }
 ```
 
-## Normal server
+## 2. Normal server
 
 Shutting down the server gracefully 
 
@@ -111,7 +111,7 @@ console output
     DEBU[2020-02-16T07:36:40+09:00] engine has been stopped  
     
     
-## Server including HTTP Server
+## 3. Server including HTTP Server
 
 Shutting down the server including HTTP server
 
@@ -131,7 +131,7 @@ Console output
     DEBU[2020-02-16T07:45:40+09:00] server has been stopped                      
     DEBU[2020-02-16T07:45:40+09:00] engine has been stopped
     
-## Server with multiprocessing
+## 4. Server with multiprocessing
 
 Shutting down server with multiprocessing
 
@@ -177,7 +177,7 @@ Console output
     time="2020-03-04T15:17:07+09:00" level=debug msg="server has been stopped"
     time="2020-03-04T15:17:07+09:00" level=debug msg="engine has been stopped"    
 
-## Multiple servers
+## 5. Multiple servers
 
 Shutting down multiple servers gracefully
 
