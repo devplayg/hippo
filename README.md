@@ -49,6 +49,14 @@ if err := engine.Start(); err != nil {
 }
 ```
 
+Console output
+
+    time="2020-03-05T10:30:00+09:00" level=debug msg="engine has been started"
+    time="2020-03-05T10:30:00+09:00" level=debug msg="server has been started"
+    time="2020-03-05T10:30:00+09:00" level=debug msg="server has been stopped"
+    time="2020-03-05T10:30:00+09:00" level=debug msg="engine has been stopped"
+
+
 ### Log to the file
 
 powered by https://github.com/sirupsen/logrus
@@ -132,6 +140,10 @@ Console output
     DEBU[2020-02-16T07:45:40+09:00] engine has been stopped
     
 ## 4. Server with multiprocessing
+
+(Would you stop GRACEFULLY?)
+
+![Image of Yaktocat](would-you-stop.png)
 
 Shutting down server with multiprocessing
 
