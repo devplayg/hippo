@@ -29,9 +29,9 @@ func (s *SimpleServer) Stop() error {
 }
 ```
 
-## Run
+### Run
 
-### Simple
+#### Simple
 
 ```go
 engine := hippo.NewEngine(&SimpleServer{}, nil)
@@ -40,7 +40,7 @@ if err := engine.Start(); err != nil {
 }
 ```
 
-### Debug
+#### Debug
 
 ```go
 engine := hippo.NewEngine(&SimpleServer{}, &hippo.Config{Debug:true})
@@ -57,7 +57,7 @@ Console output
     time="2020-03-05T10:30:00+09:00" level=debug msg="engine has been stopped"
 
 
-### Log to the file
+#### Log to the file
 
 powered by https://github.com/sirupsen/logrus
 
