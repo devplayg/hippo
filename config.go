@@ -13,6 +13,9 @@ type Config struct {
 	Debug       bool
 	Trace       bool
 	Logger      *log.Logger
+	CertFile    string
+	KeyFile     string
+	Insecure    bool
 }
 
 func newDefaultConfig(processName string) *Config {
@@ -23,5 +26,8 @@ func newDefaultConfig(processName string) *Config {
 		LogDir:      "",
 		Debug:       false,
 		Trace:       false,
+		Insecure:    false,
+		CertFile:    "",
+		KeyFile:     "",
 	}
 }

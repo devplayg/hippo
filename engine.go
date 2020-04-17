@@ -134,7 +134,7 @@ func (e *Engine) Start() error {
 	go func() {
 		e.log.Debug("engine has been started")
 		e.errChan <- e.server.Start()
-		done <- true
+		close(done)
 	}()
 	e.waitForSignals()
 	<-done
@@ -174,6 +174,15 @@ func (e *Engine) waitForSignals() {
 
 func (e *Engine) context() context.Context {
 	return e.ctx
+}
+
+// Path returns absolute directory
+func (e *Engine) Path(path string) string {
+	if filepath.IsAbs(path) {
+		return path
+	}
+
+	return filepath.ToSlash(filepath.Join(e.workingDir, path))
 }
 
 func ensureDir(dir string) error {
