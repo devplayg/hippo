@@ -6,7 +6,7 @@ import (
 
 // Simple server
 func main() {
-	engine := hippo.NewEngine(&SimpleServer{}, &hippo.Config{Debug: true})
+	engine := hippo.NewEngine(&Server{}, &hippo.Config{Debug: true})
 	if err := engine.Start(); err != nil {
 		panic(err)
 	}
@@ -18,7 +18,7 @@ func main() {
 //		Debug: true,
 //		//Trace: true,
 //	}
-//	engine := hippo.NewEngine(&SimpleServer{}, config)
+//	engine := hippo.NewEngine(&Server{}, config)
 //	if err := engine.Start(); err != nil {
 //		panic(err)
 //	}
@@ -30,22 +30,22 @@ func main() {
 //		Debug:  true,
 //		LogDir: ".",
 //	}
-//	engine := hippo.NewEngine(&SimpleServer{}, config)
+//	engine := hippo.NewEngine(&Server{}, config)
 //	if err := engine.Start(); err != nil {
 //		panic(err)
 //	}
 //}
 
-type SimpleServer struct {
-	hippo.Launcher // DO NOT REMOVE; Launcher links servers and engines each other.
+type Server struct {
+	hippo.Launcher // DO NOT REMOVE; Launcher links server and engine each other.
 }
 
-func (s *SimpleServer) Start() error {
+func (s *Server) Start() error {
 	s.Log.Debug("server has been started")
 	return nil
 }
 
-func (s *SimpleServer) Stop() error {
+func (s *Server) Stop() error {
 	s.Log.Debug("server has been stopped")
 	return nil
 }

@@ -28,7 +28,7 @@ notifications:
 # failing test, we want to see both. Configure golangci-lint with a
 # .golangci.yml file at the top level of your repo.
 script:
-  - go build examples/simple/server.go
-  - go build examples/normal/server.go
-  - go build examples/normal-multiple/server.go
-  - go build examples/server-with-multiprocessing/server.go
+  - go build examples/simple/main.go
+  - go build examples/normal/main.go
+  - go build examples/multiple/main.go
+  - go build examples/http/main.go

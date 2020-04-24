@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"github.com/devplayg/hippo/v2"
 	"net/http"
 	"sync"
@@ -12,7 +11,7 @@ import (
 func main() {
 	config := &hippo.Config{
 		Name:        "Simple Server",
-		Description: "simple server based on Hippo",
+		Description: "simple server based on Hippo engine",
 		Version:     "2.1",
 		Debug:       true,
 		Trace:       false,
@@ -24,7 +23,7 @@ func main() {
 }
 
 type Server struct {
-	hippo.Launcher // DO NOT REMOVE; Launcher links servers and engines each other.
+	hippo.Launcher // DO NOT REMOVE; Launcher links server and engine each other.
 }
 
 func (s *Server) Start() error {
@@ -36,6 +35,8 @@ func (s *Server) Start() error {
 		defer wg.Done()
 		if err := s.startServer1(); err != nil {
 			s.Log.Error(err)
+			s.Cancel()
+			return
 		}
 	}()
 
@@ -45,6 +46,8 @@ func (s *Server) Start() error {
 		defer wg.Done()
 		if err := s.startServer2(); err != nil {
 			s.Log.Error(err)
+			s.Cancel()
+			return
 		}
 	}()
 
@@ -54,6 +57,8 @@ func (s *Server) Start() error {
 		defer wg.Done()
 		if err := s.startHttpServer(); err != nil {
 			s.Log.Error(err)
+			s.Cancel()
+			return
 		}
 	}()
 
@@ -64,8 +69,9 @@ func (s *Server) Start() error {
 
 func (s *Server) startServer1() error {
 	s.Log.Debug("server-1 has been started")
+	defer s.Log.Debug("server-1 has been stopped")
 	for {
-		s.Log.Info("server-1 is working on it")
+		s.Log.Debug("server-1 is working on it")
 		select {
 		case <-s.Ctx.Done(): // for gracefully shutdown
 			s.Log.Debug("server-1 canceled; no longer works")
@@ -77,11 +83,11 @@ func (s *Server) startServer1() error {
 
 func (s *Server) startServer2() error {
 	s.Log.Debug("server-2 has been started")
+	defer s.Log.Debug("server-2 has been stopped")
 	for {
-		s.Log.Info("server-2 is working on it")
+		s.Log.Debug("server-2 is working on it")
 
-		// s.Cancel() // if you want to stop all server, uncomment this line
-		return errors.New("intentional error on server-2; no longer works")
+		// return errors.New("intentional error on server-2; no longer works")
 
 		select {
 		case <-s.Ctx.Done(): // for gracefully shutdown
@@ -93,24 +99,29 @@ func (s *Server) startServer2() error {
 }
 
 func (s *Server) startHttpServer() error {
-	var srv http.Server
+	s.Log.Debug("HTTP server has been started")
+	defer s.Log.Debug("HTTP server has been stopped")
 
-	ch := make(chan struct{})
+	// Start HTTP server
+	var srv http.Server
+	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
-		<-s.Ctx.Done()
-		if err := srv.Shutdown(context.Background()); err != nil {
-			s.Log.Error(err)
+		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
+			ctx = context.WithValue(ctx, "err", err)
+			cancel()
 		}
-		close(ch)
 	}()
 
-	s.Log.Debug("HTTP server has been started")
-	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
-		s.Log.Fatalf("HTTP server ListenAndServe: %v", err)
+	select {
+	case <-ctx.Done(): // from local context
+		return ctx.Value("err").(error)
+
+	case <-s.Ctx.Done(): // from receiver context
+		if err := srv.Shutdown(context.Background()); err != http.ErrServerClosed {
+			return err
+		}
+		return nil
 	}
-	<-ch
-	s.Log.Debug("HTTP server has been stopped")
-	return nil
 }
 
 func (s *Server) Stop() error {
