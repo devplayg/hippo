@@ -121,7 +121,7 @@ Output structure
 ## 3. Server working with HTTP Server
 
 Shutting down the server including HTTP server; 
-[Example](https://github.com/devplayg/hippo/blob/master/examples/normal-http-server/main.go)
+[Example](https://github.com/devplayg/hippo/blob/master/examples/http/main.go)
 
 Output structure
 
