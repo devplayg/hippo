@@ -54,7 +54,12 @@ if err := engine.Start(); err != nil {
 }
 ```
 
-#### Log to a file (*powered by [logrus](https://github.com/sirupsen/logrus) & [lumberjack](https://github.com/natefinch/lumberjack)*)
+#### Logging
+ 
+Powered by
+ 
+- [logrus](https://github.com/sirupsen/logrus) for logging
+- [lumberjack](https://github.com/natefinch/lumberjack) for log rotation
 
 ```go
 config := &hippo.Config{
