@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/sirupsen/logrus"
+	"gopkg.in/natefinch/lumberjack.v2"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -102,6 +103,8 @@ func (e *Engine) initLogger() error {
 	logger.SetFormatter(&logrus.TextFormatter{
 		DisableColors: true,
 	})
+
+	// Set log directory
 	logDir := e.workingDir
 	if len(e.Config.LogDir) > 0 {
 		dir, err := filepath.Abs(e.Config.LogDir)
@@ -113,12 +116,13 @@ func (e *Engine) initLogger() error {
 		}
 		logDir = dir
 	}
-	logPath := filepath.Join(logDir, filepath.Base(e.processName)+".log")
-	file, err := os.OpenFile(logPath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-	if err != nil {
-		return err
-	}
-	logger.SetOutput(file)
+	logger.SetOutput(&lumberjack.Logger{
+		Filename:   filepath.Join(logDir, filepath.Base(e.processName)+".log"),
+		MaxSize:    1,  // MB
+		MaxBackups: 10, // Rolling count
+		MaxAge:     30, // Days
+		Compress:   false,
+	})
 	return nil
 }
 
@@ -162,7 +166,7 @@ func (e *Engine) waitForSignals() {
 		select {
 		case err := <-e.errChan:
 			if err != nil {
-				e.log.Error(fmt.Errorf("server has stopped: %w", err))
+				e.log.Error(fmt.Errorf("server has been stopped: %w", err))
 			}
 			return
 		case <-ch:

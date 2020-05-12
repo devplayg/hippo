@@ -1,9 +1,5 @@
 package hippo
 
-import (
-	"log"
-)
-
 // Hippo configuration struct
 type Config struct {
 	Name        string
@@ -12,7 +8,6 @@ type Config struct {
 	LogDir      string
 	Debug       bool
 	Trace       bool
-	Logger      *log.Logger
 	CertFile    string
 	KeyFile     string
 	Insecure    bool
