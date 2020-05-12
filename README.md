@@ -54,7 +54,7 @@ if err := engine.Start(); err != nil {
 }
 ```
 
-#### Log to a file (*powered by [logrus](https://github.com/sirupsen/logrus)*)
+#### Log to a file (*powered by [logrus](https://github.com/sirupsen/logrus) & [lumberjack](https://github.com/natefinch/lumberjack)*)
 
 ```go
 config := &hippo.Config{
