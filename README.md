@@ -39,7 +39,7 @@ func (s *Server) Stop() error {
 #### Run
 
 ```go
-engine := hippo.NewEngine(&SimpleServer{}, nil)
+engine := hippo.NewEngine(&Server{}, nil)
 if err := engine.Start(); err != nil {
     panic(err)
 }
@@ -48,7 +48,7 @@ if err := engine.Start(); err != nil {
 #### Debug
 
 ```go
-engine := hippo.NewEngine(&SimpleServer{}, &hippo.Config{Debug:true})
+engine := hippo.NewEngine(&Server{}, &hippo.Config{Debug:true})
 if err := engine.Start(); err != nil {
     panic(err)
 }
@@ -61,7 +61,7 @@ config := &hippo.Config{
     Debug:  true,
     LogDir: "/var/log/",
 }
-engine := hippo.NewEngine(&SimpleServer{}, config)
+engine := hippo.NewEngine(&Server{}, config)
 if err := engine.Start(); err != nil {
     s.Log.Error(err)
 }
