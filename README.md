@@ -10,7 +10,7 @@ The `hippo` helps servers start up safely and shut down gracefully.
 Import it in your program as:
 
 ```go
-import "github.com/devplayg/hippo/v2"
+import "github.com/devplayg/hippo"
 ```
 
 (Would you stop GRACEFULLY?)
@@ -23,14 +23,15 @@ Simple server;
 [Example](https://github.com/devplayg/hippo/blob/master/examples/simple/main.go)
 
 ```go
-engine := hippo.NewEngine(&Server{}, nil)
-    if err := engine.Start(); err != nil {
-    panic(err)
+func main() {
+    hippo := hippo.NewHippo(&Server{}, nil)
+    if err := hippo.Start(); err != nil {
+        panic(err)
+    }
 }
-
 // Server
 type Server struct {
-	hippo.Launcher // DO NOT REMOVE; Launcher links server and engine each other.
+	hippo.Launcher // DO NOT REMOVE; Launcher links server and hippo each other.
 }
 
 func (s *Server) Start() error {
@@ -57,14 +58,14 @@ Shutting down the server gracefully;
 
 ```go
 func main() {
-    engine := hippo.NewHippo(&Server{}, nil)
-    if err := engine.Start(); err != nil {
+    hippo := hippo.NewHippo(&Server{}, nil)
+    if err := hippo.Start(); err != nil {
         panic(err)
     }
 }
 
 type Server struct {
-    hippo.Launcher // DO NOT REMOVE; Launcher links server and engine each other.
+    hippo.Launcher // DO NOT REMOVE; Launcher links server and hippo each other.
 }
 
 func (s *Server) Start() error {
@@ -132,7 +133,7 @@ Shutting down multiple servers gracefully;
 
 Output structure
 
-    engine has been started
+    hippo has been started
         HTTP server has been started
         server-1 has been started
         server-2 has been started
@@ -144,4 +145,4 @@ Output structure
         server-1 has been stopped
         server-2 has been stopped
         HTTP server has been stopped
-    engine has been stopped
+    hippo has been stopped
