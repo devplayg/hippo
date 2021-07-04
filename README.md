@@ -7,15 +7,14 @@ The `hippo` helps servers start up safely and shut down gracefully.
 
 ![Hippo](hippo.png)
 
+![Image of Yaktocat](would-you-stop.png)
+
 Import it in your program as:
 
 ```go
 import "github.com/devplayg/hippo"
 ```
 
-(Would you stop GRACEFULLY?)
-
-![Image of Yaktocat](would-you-stop.png)
 
 ## 1. Simple server 
 
