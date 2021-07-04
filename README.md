@@ -45,10 +45,10 @@ func (s *Server) Stop() error {
 ```
 
 ```
-2021/07/04 00:23:46 hippo has been started
-2021/07/04 00:23:46     server has been started
-2021/07/04 00:23:46     server has been stopped
-2021/07/04 00:23:46 hippo has been stopped
+hippo has been started
+    server has been started
+    server has been stopped
+hippo has been stopped
 ```
 
 
