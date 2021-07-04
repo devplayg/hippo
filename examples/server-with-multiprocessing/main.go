@@ -37,7 +37,7 @@ type Server struct {
 }
 
 func (s *Server) Start() error {
-	s.Log.Printf("%s has been started", s.Hippo.Config.Name)
+	s.Log.Print("server has been started")
 	if err := s.run(); err != nil {
 		s.Log.Print(err)
 		return err
@@ -46,7 +46,7 @@ func (s *Server) Start() error {
 }
 
 func (s *Server) Stop() error {
-	s.Log.Printf("%s has been stopped", s.Hippo.Config.Name)
+	s.Log.Print("server has been stopped")
 	return nil
 }
 

@@ -29,6 +29,7 @@ func main() {
         panic(err)
     }
 }
+
 // Server
 type Server struct {
 	hippo.Launcher // DO NOT REMOVE; Launcher links server and hippo each other.
@@ -88,21 +89,21 @@ func (s *Server) Start() error {
 }
 
 func (s *Server) Stop() error {
-s.Log.Print("server has been stopped")
+    s.Log.Print("server has been stopped")
 return nil
 }
 
 ```
 
-Output structure
+Output 
 
 ```
-2021/07/04 00:35:05 hippo has been started
-2021/07/04 00:35:05   server has been started
-2021/07/04 00:35:05     working on it
-2021/07/04 00:35:05     an error occurred while the server was running: intentional error
-2021/07/04 00:35:05   server has been stopped
-2021/07/04 00:35:05 hippo has been stopped
+hippo has been started
+  server has been started
+    working on it
+    an error occurred while the server was running: intentional error
+  server has been stopped
+hippo has been stopped
 ```
     
     
@@ -111,19 +112,20 @@ Output structure
 Shutting down the server including HTTP server; 
 [Example](https://github.com/devplayg/hippo/blob/master/examples/http/main.go)
 
-Output structure
+Output 
 
-2021/07/04 00:58:40 hippo has been started
-2021/07/04 00:58:40    waiting..
-2021/07/04 00:58:40    http server has been started
-2021/07/04 00:58:40    repetitive work
-2021/07/04 00:58:42    repetitive work
-2021/07/04 00:58:44    repetitive work
-2021/07/04 00:58:45    received signal, shutting down..
-2021/07/04 00:58:45    hippo asked to stop repetitive tasks
-2021/07/04 00:58:45    hippo asked to stop web server
-2021/07/04 00:58:45    server has been stopped
-2021/07/04 00:58:45 hippo has been stopped
+```
+hippo has been started
+    http server has been started
+    server has been started
+        repetitive work
+        repetitive work
+        repetitive work
+        received signal, shutting down..
+    server has been stopped
+    http server has been stopped
+hippo has been stopped
+```
     
     
 ## 4. Multiple servers
@@ -131,18 +133,39 @@ Output structure
 Shutting down multiple servers gracefully;
 [Example](https://github.com/devplayg/hippo/blob/master/examples/multiple/main.go)
 
-Output structure
+Output
 
-    hippo has been started
-        HTTP server has been started
+```
+hippo has been started
+    all servers has been started
+        http server has been started
         server-1 has been started
-        server-2 has been started
+        server-1 has been started
+            server-2 is working on it
+            server-1 is working on it
             server-1 is working on it
             server-2 is working on it
-                received signal, shutting down..
+            received signal, shutting down..
             server-2 canceled; no longer works
             server-1 canceled; no longer works
-        server-1 has been stopped
         server-2 has been stopped
-        HTTP server has been stopped
-    hippo has been stopped
+        server-1 has been stopped
+        http server has been stopped
+    all server has been stopped
+hippo has been stopped
+```
+
+
+## 5. Server with [Logrus](https://github.com/sirupsen/logrus)
+
+
+```go
+func main() {
+	hippo := hippo.NewHippo(&Server{}, &hippo.Config{
+		Logger: logrus.New(),
+	})
+	if err := hippo.Start(); err != nil {
+		panic(err)
+	}
+}
+```

@@ -24,10 +24,14 @@ type ServerWithHttp struct {
 func (s *ServerWithHttp) Start() error {
 	wg := new(sync.WaitGroup)
 
-	// Start USER server
+	// Start server
 	wg.Add(1)
 	go func() {
-		defer wg.Done()
+		defer func() {
+			log.Print("server has been stopped")
+			wg.Done()
+		}()
+		log.Print("server has been started")
 		if err := s.startRepetitiveWork(); err != nil {
 			log.Print(fmt.Errorf("repetitive work error; %w", err))
 			s.Cancel() // error? Stop all servers
@@ -35,10 +39,14 @@ func (s *ServerWithHttp) Start() error {
 		}
 	}()
 
-	// Start USER server
+	// Start http server
 	wg.Add(1)
 	go func() {
-		defer wg.Done()
+		defer func() {
+			log.Print("http server has been stopped")
+			wg.Done()
+		}()
+		log.Print("http server has been started")
 		if err := s.startHttpServer(); err != nil {
 			log.Print(fmt.Errorf("http server error; %w", err))
 			s.Cancel() // error? Stop all servers
@@ -47,7 +55,6 @@ func (s *ServerWithHttp) Start() error {
 	}()
 
 	// Wait for all servers to stop
-	s.Log.Print("waiting..")
 	wg.Wait()
 
 	return nil
@@ -60,7 +67,6 @@ func (s *ServerWithHttp) startRepetitiveWork() error {
 
 		select {
 		case <-s.Ctx.Done(): // for gracefully shutdown
-			s.Log.Print("hippo asked to stop repetitive tasks")
 			return nil
 		case <-time.After(2 * time.Second):
 		}
@@ -71,7 +77,6 @@ func (s *ServerWithHttp) startHttpServer() error {
 	var srv http.Server
 	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
-		s.Log.Print("http server has been started")
 		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
 			ctx = context.WithValue(ctx, "err", err)
 			cancel()
@@ -83,7 +88,6 @@ func (s *ServerWithHttp) startHttpServer() error {
 		return ctx.Value("err").(error)
 
 	case <-s.Ctx.Done(): // from receiver context
-		s.Log.Print("hippo asked to stop http server")
 		if err := srv.Shutdown(context.Background()); err != http.ErrServerClosed {
 			return err
 		}
@@ -92,6 +96,5 @@ func (s *ServerWithHttp) startHttpServer() error {
 }
 
 func (s *ServerWithHttp) Stop() error {
-	s.Log.Print("server has been stopped")
 	return nil
 }

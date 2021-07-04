@@ -25,7 +25,11 @@ func (s *Server) Start() error {
 	// Server 1
 	wg.Add(1)
 	go func() {
-		defer wg.Done()
+		defer func() {
+			s.Log.Print("server-1 has been stopped")
+			wg.Done()
+		}()
+		s.Log.Print("server-1 has been started")
 		if err := s.startServer1(); err != nil {
 			s.Log.Print(err)
 			s.Cancel()
@@ -36,7 +40,12 @@ func (s *Server) Start() error {
 	// Server 2
 	wg.Add(1)
 	go func() {
-		defer wg.Done()
+		defer func() {
+			s.Log.Print("server-2 has been stopped")
+			wg.Done()
+		}()
+
+		s.Log.Print("server-2 has been started")
 		if err := s.startServer2(); err != nil {
 			s.Log.Print(err)
 			s.Cancel()
@@ -47,7 +56,12 @@ func (s *Server) Start() error {
 	// Server 3
 	wg.Add(1)
 	go func() {
-		defer wg.Done()
+		defer func() {
+			s.Log.Print("http server has been stopped")
+			wg.Done()
+		}()
+		s.Log.Print("http server has been started")
+
 		if err := s.startHttpServer(); err != nil {
 			s.Log.Print(err)
 			s.Cancel()
@@ -61,8 +75,6 @@ func (s *Server) Start() error {
 }
 
 func (s *Server) startServer1() error {
-	s.Log.Print("server-1 has been started")
-	defer s.Log.Print("server-1 has been stopped")
 	for {
 		s.Log.Print("server-1 is working on it")
 		select {
@@ -75,8 +87,6 @@ func (s *Server) startServer1() error {
 }
 
 func (s *Server) startServer2() error {
-	s.Log.Print("server-2 has been started")
-	defer s.Log.Print("server-2 has been stopped")
 	for {
 		s.Log.Print("server-2 is working on it")
 
@@ -95,7 +105,7 @@ func (s *Server) startHttpServer() error {
 	var srv http.Server
 	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
-		s.Log.Print("http server has been started")
+
 		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
 			ctx = context.WithValue(ctx, "err", err)
 			cancel()
@@ -107,7 +117,6 @@ func (s *Server) startHttpServer() error {
 		return ctx.Value("err").(error)
 
 	case <-s.Ctx.Done(): // from receiver context
-		s.Log.Print("hippo asked to stop http server")
 		if err := srv.Shutdown(context.Background()); err != http.ErrServerClosed {
 			return err
 		}

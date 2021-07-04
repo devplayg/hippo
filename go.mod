@@ -1,1 +1,1 @@
-module "github.com/devplayg/hippo"
+module github.com/devplayg/hippo
