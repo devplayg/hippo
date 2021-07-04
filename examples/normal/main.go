@@ -1,41 +1,34 @@
 package main
 
 import (
-	"github.com/devplayg/hippo/v2"
+	"github.com/devplayg/hippo"
 	"time"
 )
 
 func main() {
-	config := &hippo.Config{
-		Name:        "Simple Server",
-		Description: "simple server based on Hippo engine",
-		Version:     "2.1",
-		Debug:       true,
-		Trace:       false,
-	}
-	engine := hippo.NewEngine(&Server{}, config)
-	if err := engine.Start(); err != nil {
+	hippo := hippo.NewHippo(&Server{}, nil)
+	if err := hippo.Start(); err != nil {
 		panic(err)
 	}
 }
 
 type Server struct {
-	hippo.Launcher // DO NOT REMOVE; Launcher links server and engine each other.
+	hippo.Launcher // DO NOT REMOVE; Launcher links server and hippo each other.
 }
 
 func (s *Server) Start() error {
-	s.Log.Debug("server has been started")
+	s.Log.Print("server has been started")
 
 	for {
-		// Do your repetitive jobs
-		s.Log.Info("server is working on it")
+		// repetitive work
+		s.Log.Print("working on it")
 
 		// Intentional error
-		// return errors.New("intentional error")
+		//return errors.New("intentional error")
 
 		select {
 		case <-s.Ctx.Done(): // for gracefully shutdown
-			s.Log.Debug("server canceled; no longer works")
+			s.Log.Print("hippo asked me to stop working")
 			return nil
 		case <-time.After(2 * time.Second):
 		}
@@ -43,6 +36,6 @@ func (s *Server) Start() error {
 }
 
 func (s *Server) Stop() error {
-	s.Log.Debug("server has been stopped")
+	s.Log.Print("server has been stopped")
 	return nil
 }

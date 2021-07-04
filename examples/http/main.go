@@ -2,36 +2,34 @@ package main
 
 import (
 	"context"
-	"github.com/devplayg/hippo/v2"
+	"fmt"
+	"github.com/devplayg/hippo"
+	"log"
 	"net/http"
 	"sync"
 	"time"
 )
 
 func main() {
-	config := &hippo.Config{
-		Name:        "Simple Server",
-		Description: "simple server based on Hippo engine",
-		Version:     "2.1",
-		Debug:       true,
-	}
-	engine := hippo.NewEngine(&Server{}, config)
-	if err := engine.Start(); err != nil {
+	hippo := hippo.NewHippo(&ServerWithHttp{}, nil)
+	if err := hippo.Start(); err != nil {
 		panic(err)
 	}
 }
 
-type Server struct {
-	hippo.Launcher // DO NOT REMOVE; Launcher links server and engine each other.
+type ServerWithHttp struct {
+	hippo.Launcher // DO NOT REMOVE; Launcher links server and hippo each other.
 }
 
-func (s *Server) Start() error {
+func (s *ServerWithHttp) Start() error {
 	wg := new(sync.WaitGroup)
 
 	// Start USER server
 	wg.Add(1)
 	go func() {
-		if err := s.startUserServer(wg); err != nil {
+		defer wg.Done()
+		if err := s.startRepetitiveWork(); err != nil {
+			log.Print(fmt.Errorf("repetitive work error; %w", err))
 			s.Cancel() // error? Stop all servers
 			return
 		}
@@ -40,40 +38,40 @@ func (s *Server) Start() error {
 	// Start USER server
 	wg.Add(1)
 	go func() {
-		if err := s.startHttpServer(wg); err != nil {
+		defer wg.Done()
+		if err := s.startHttpServer(); err != nil {
+			log.Print(fmt.Errorf("http server error; %w", err))
 			s.Cancel() // error? Stop all servers
 			return
 		}
 	}()
 
 	// Wait for all servers to stop
+	s.Log.Print("waiting..")
 	wg.Wait()
 
 	return nil
 
 }
 
-func (s *Server) startUserServer(wg *sync.WaitGroup) error {
-	defer wg.Done()
+func (s *ServerWithHttp) startRepetitiveWork() error {
 	for {
-		// Do your repetitive jobs
-		s.Log.Debug("server is working on it")
+		s.Log.Print("repetitive work")
 
 		select {
 		case <-s.Ctx.Done(): // for gracefully shutdown
+			s.Log.Print("hippo asked to stop repetitive tasks")
 			return nil
 		case <-time.After(2 * time.Second):
 		}
 	}
 }
 
-func (s *Server) startHttpServer(wg *sync.WaitGroup) error {
-	defer wg.Done()
-
-	// Start HTTP server
+func (s *ServerWithHttp) startHttpServer() error {
 	var srv http.Server
 	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
+		s.Log.Print("http server has been started")
 		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
 			ctx = context.WithValue(ctx, "err", err)
 			cancel()
@@ -85,6 +83,7 @@ func (s *Server) startHttpServer(wg *sync.WaitGroup) error {
 		return ctx.Value("err").(error)
 
 	case <-s.Ctx.Done(): // from receiver context
+		s.Log.Print("hippo asked to stop http server")
 		if err := srv.Shutdown(context.Background()); err != http.ErrServerClosed {
 			return err
 		}
@@ -92,7 +91,7 @@ func (s *Server) startHttpServer(wg *sync.WaitGroup) error {
 	}
 }
 
-func (s *Server) Stop() error {
-	s.Log.Debug("server has been stopped")
+func (s *ServerWithHttp) Stop() error {
+	s.Log.Print("server has been stopped")
 	return nil
 }

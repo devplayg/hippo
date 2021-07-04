@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/devplayg/hippo/v2"
+	"github.com/devplayg/hippo"
 	"math/rand"
 	"sync/atomic"
 	"time"
@@ -18,19 +18,14 @@ func main() {
 	// Random seed
 	rand.Seed(time.Now().UnixNano())
 
-	// Config
-	config := &hippo.Config{
-		Debug: true,
-	}
-
 	// Server
 	company := &Server{
 		workerCount: 8,
 	}
 
-	// Start engine after loading the server into the engine
-	engine := hippo.NewEngine(company, config)
-	if err := engine.Start(); err != nil {
+	// Start hippo after loading the server into the hippo
+	hippo := hippo.NewHippo(company, nil)
+	if err := hippo.Start(); err != nil {
 		panic(err)
 	}
 }
@@ -42,21 +37,21 @@ type Server struct {
 }
 
 func (s *Server) Start() error {
-	s.Log.Debugf("%s has been started", s.Engine.Config.Name)
+	s.Log.Printf("%s has been started", s.Hippo.Config.Name)
 	if err := s.run(); err != nil {
-		s.Log.Error(err)
+		s.Log.Print(err)
 		return err
 	}
 	return nil
 }
 
 func (s *Server) Stop() error {
-	s.Log.Debugf("%s has been stopped", s.Engine.Config.Name)
+	s.Log.Printf("%s has been stopped", s.Hippo.Config.Name)
 	return nil
 }
 
 func (s *Server) run() error {
-	s.Log.Debugf("%d workers are ready", s.workerCount)
+	s.Log.Printf("%d workers are ready", s.workerCount)
 	ch := make(chan bool, s.workerCount)
 
 	for {
@@ -68,7 +63,7 @@ func (s *Server) run() error {
 		}
 
 		tasks, _ := s.getTasks()
-		s.Log.Debugf("found %d tasks", len(tasks))
+		s.Log.Printf("found %d tasks", len(tasks))
 
 		err := s.distributeTasks(tasks, ch)
 		if err != nil {
@@ -98,7 +93,7 @@ func (s *Server) distributeTasks(tasks []string, ch chan bool) error {
 				// Handle task
 				go func(myTask string) {
 					defer func() {
-						s.Log.Debugf("done %s", myTask)
+						s.Log.Printf("done %s", myTask)
 
 						// Mark an worker as waiting
 						atomic.AddInt32(&s.currentWorking, -1)
@@ -111,7 +106,7 @@ func (s *Server) distributeTasks(tasks []string, ch chan bool) error {
 
 					// Handle task
 					if err := s.handleTask(myTask); err != nil {
-						s.Log.Error(err)
+						s.Log.Print(err)
 					}
 				}(task)
 			}
@@ -120,11 +115,11 @@ func (s *Server) distributeTasks(tasks []string, ch chan bool) error {
 		select {
 		case <-s.Ctx.Done(): // for gracefully shutdown
 			// Wait for working workers
-			s.Log.Debugf("waiting for working %d workers", s.currentWorking)
+			s.Log.Printf("waiting for working %d workers", s.currentWorking)
 			for s.currentWorking > 0 {
 				time.Sleep(100 * time.Millisecond)
 			}
-			s.Log.Debug("works of all workers are over")
+			s.Log.Print("works of all workers are over")
 			return s.Ctx.Err()
 		case <-time.After(1 * time.Millisecond):
 		}
@@ -134,7 +129,7 @@ func (s *Server) distributeTasks(tasks []string, ch chan bool) error {
 }
 
 func (s *Server) handleTask(task string) error {
-	s.Log.Debugf("working %s", task)
+	s.Log.Printf("working %s", task)
 	time.Sleep(time.Duration(rand.Intn(10)) * time.Second)
 	return nil
 }

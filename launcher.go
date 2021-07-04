@@ -2,21 +2,20 @@ package hippo
 
 import (
 	"context"
-	"github.com/sirupsen/logrus"
 )
 
 type Launcher struct {
-	Engine     *Engine
-	Log        *logrus.Logger
+	Hippo      *Hippo
+	Log        StdLogger
 	Ctx        context.Context
 	Cancel     context.CancelFunc
 	WorkingDir string
 }
 
-func (l *Launcher) setEngine(e *Engine) {
-	l.Engine = e
-	l.Log = e.log
-	l.Ctx = e.context()
-	l.Cancel = e.cancel
-	l.WorkingDir = e.workingDir
+func (l *Launcher) init(h *Hippo) {
+	l.Hippo = h
+	l.Log = h.log
+	l.Ctx = h.context()
+	l.Cancel = h.cancel
+	l.WorkingDir = h.workingDir
 }

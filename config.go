@@ -1,28 +1,17 @@
 package hippo
 
-// Hippo configuration struct
+// Config is hippo configuration
 type Config struct {
 	Name        string
 	Description string
 	Version     string
-	LogDir      string
-	Debug       bool
-	Trace       bool
-	CertFile    string
-	KeyFile     string
-	Insecure    bool
+	Logger      StdLogger
 }
 
 func newDefaultConfig(processName string) *Config {
 	return &Config{
 		Name:        processName,
 		Description: processName,
-		Version:     "unknown",
-		LogDir:      "",
-		Debug:       false,
-		Trace:       false,
-		Insecure:    false,
-		CertFile:    "",
-		KeyFile:     "",
+		Version:     "0.0.1",
 	}
 }

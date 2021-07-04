@@ -1,11 +1,10 @@
-// Hippo is an easy, fast, lightweight server framework.
+// Package hippo is an easy, fast, lightweight server framework.
 package hippo
 
 import (
 	"context"
 	"fmt"
-	"github.com/sirupsen/logrus"
-	"gopkg.in/natefinch/lumberjack.v2"
+	"log"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -14,8 +13,8 @@ import (
 	"time"
 )
 
-// Engine supports engine framework.
-type Engine struct {
+// Hippo helps servers start up safely and shut down gracefully..
+type Hippo struct {
 	workingDir  string
 	Config      *Config
 	processName string
@@ -24,13 +23,13 @@ type Engine struct {
 	ctx         context.Context
 	cancel      context.CancelFunc
 	errChan     chan error
-	log         *logrus.Logger
+	log         StdLogger
 }
 
-// NewEngine allocates a new server to engine.
-func NewEngine(server Server, config *Config) *Engine {
+// NewHippo allocates a new server to hippo.
+func NewHippo(server Server, config *Config) *Hippo {
 	ctx, cancel := context.WithCancel(context.Background())
-	return &Engine{
+	return &Hippo{
 		processName: strings.TrimSuffix(filepath.Base(os.Args[0]), filepath.Ext(os.Args[0])),
 		server:      server,
 		Config:      config,
@@ -41,7 +40,7 @@ func NewEngine(server Server, config *Config) *Engine {
 	}
 }
 
-func (e *Engine) init() error {
+func (e *Hippo) init() error {
 	if err := e.initConfig(); err != nil {
 		return err
 	}
@@ -54,7 +53,7 @@ func (e *Engine) init() error {
 	return nil
 }
 
-func (e *Engine) initConfig() error {
+func (e *Hippo) initConfig() error {
 	if e.Config == nil {
 		e.Config = newDefaultConfig(e.processName)
 		return nil
@@ -71,7 +70,7 @@ func (e *Engine) initConfig() error {
 	return nil
 }
 
-func (e *Engine) initDirs() error {
+func (e *Hippo) initDirs() error {
 	workingDir, err := filepath.Abs(os.Args[0])
 	if err != nil {
 		return err
@@ -80,63 +79,25 @@ func (e *Engine) initDirs() error {
 	return nil
 }
 
-func (e *Engine) initLogger() error {
-	logger := logrus.New()
-	defer func() {
-		e.log = logger
-	}()
-	if e.Config.Debug {
-		logger.SetLevel(logrus.DebugLevel)
-	}
-	if e.Config.Trace {
-		logger.SetLevel(logrus.TraceLevel)
-	}
-	if len(e.Config.LogDir) < 1 {
-		logger.SetFormatter(&logrus.TextFormatter{
-			ForceColors:   true,
-			DisableColors: true,
-		})
-		logger.SetOutput(os.Stdout)
+func (e *Hippo) initLogger() error {
+	if e.Config.Logger == nil {
+		e.log = log.Default()
 		return nil
 	}
-
-	logger.SetFormatter(&logrus.TextFormatter{
-		DisableColors: true,
-	})
-
-	// Set log directory
-	logDir := e.workingDir
-	if len(e.Config.LogDir) > 0 {
-		dir, err := filepath.Abs(e.Config.LogDir)
-		if err != nil {
-			return fmt.Errorf("invalid log directory: %w", err)
-		}
-		if err := ensureDir(logDir); err != nil {
-			return fmt.Errorf("failed to create log directory: %w", err)
-		}
-		logDir = dir
-	}
-	logger.SetOutput(&lumberjack.Logger{
-		Filename:   filepath.Join(logDir, filepath.Base(e.processName)+".log"),
-		MaxSize:    1,  // MB
-		MaxBackups: 10, // Rolling count
-		MaxAge:     30, // Days
-		Compress:   false,
-	})
+	e.log = e.Config.Logger
 	return nil
 }
 
 // Start starts server and opens error channel.
-func (e *Engine) Start() error {
+func (e *Hippo) Start() error {
 	if err := e.init(); err != nil {
-		return fmt.Errorf("failed to initialize hippo engine: %w", err)
+		return fmt.Errorf("failed to initialize hippo: %w", err)
 	}
 
-	e.log.Trace("engine starting")
-	e.server.setEngine(e)
+	e.server.init(e)
 	done := make(chan bool)
 	go func() {
-		e.log.Debug("engine has been started")
+		e.log.Println("hippo has been started")
 		e.errChan <- e.server.Start()
 		close(done)
 	}()
@@ -149,50 +110,42 @@ func (e *Engine) Start() error {
 	return nil
 }
 
-// Stop stops engine.
-func (e *Engine) stop() error {
+// Stop stops hippo.
+func (e *Hippo) stop() error {
 	if err := e.server.Stop(); err != nil {
-		e.log.Error("failed to stop %s", e.processName)
+		e.log.Printf("failed to stop %s", e.processName)
 		return err
 	}
-	e.log.Debug("engine has been stopped")
+	e.log.Println("hippo has been stopped")
 	return nil
 }
 
-func (e *Engine) waitForSignals() {
+func (e *Hippo) waitForSignals() {
 	ch := make(chan os.Signal)
 	signal.Notify(ch, os.Interrupt, syscall.SIGTERM)
 	for {
 		select {
 		case err := <-e.errChan:
 			if err != nil {
-				e.log.Error(fmt.Errorf("server has been stopped: %w", err))
+				e.log.Println(fmt.Errorf("an error occurred while the server was running: %w", err))
 			}
 			return
 		case <-ch:
-			e.log.Info("received signal, shutting down..")
+			e.log.Println("received signal, shutting down..")
 			e.cancel()
 		}
 	}
 }
 
-func (e *Engine) context() context.Context {
+func (e *Hippo) context() context.Context {
 	return e.ctx
 }
 
 // Path returns absolute directory
-func (e *Engine) Path(path string) string {
+func (e *Hippo) Path(path string) string {
 	if filepath.IsAbs(path) {
 		return path
 	}
 
 	return filepath.ToSlash(filepath.Join(e.workingDir, path))
-}
-
-func ensureDir(dir string) error {
-	if _, err := os.Stat(dir); os.IsExist(err) {
-		return nil
-	}
-
-	return os.MkdirAll(dir, os.ModePerm)
 }

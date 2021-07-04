@@ -2,28 +2,21 @@ package main
 
 import (
 	"context"
-	"github.com/devplayg/hippo/v2"
+	"github.com/devplayg/hippo"
 	"net/http"
 	"sync"
 	"time"
 )
 
 func main() {
-	config := &hippo.Config{
-		Name:        "Simple Server",
-		Description: "simple server based on Hippo engine",
-		Version:     "2.1",
-		Debug:       true,
-		Trace:       false,
-	}
-	engine := hippo.NewEngine(&Server{}, config)
-	if err := engine.Start(); err != nil {
+	hippo := hippo.NewHippo(&Server{}, nil)
+	if err := hippo.Start(); err != nil {
 		panic(err)
 	}
 }
 
 type Server struct {
-	hippo.Launcher // DO NOT REMOVE; Launcher links server and engine each other.
+	hippo.Launcher // DO NOT REMOVE; Launcher links server and hippo each other.
 }
 
 func (s *Server) Start() error {
@@ -34,7 +27,7 @@ func (s *Server) Start() error {
 	go func() {
 		defer wg.Done()
 		if err := s.startServer1(); err != nil {
-			s.Log.Error(err)
+			s.Log.Print(err)
 			s.Cancel()
 			return
 		}
@@ -45,7 +38,7 @@ func (s *Server) Start() error {
 	go func() {
 		defer wg.Done()
 		if err := s.startServer2(); err != nil {
-			s.Log.Error(err)
+			s.Log.Print(err)
 			s.Cancel()
 			return
 		}
@@ -56,25 +49,25 @@ func (s *Server) Start() error {
 	go func() {
 		defer wg.Done()
 		if err := s.startHttpServer(); err != nil {
-			s.Log.Error(err)
+			s.Log.Print(err)
 			s.Cancel()
 			return
 		}
 	}()
 
-	s.Log.Debug("all servers has been started")
+	s.Log.Print("all servers has been started")
 	wg.Wait()
 	return nil
 }
 
 func (s *Server) startServer1() error {
-	s.Log.Debug("server-1 has been started")
-	defer s.Log.Debug("server-1 has been stopped")
+	s.Log.Print("server-1 has been started")
+	defer s.Log.Print("server-1 has been stopped")
 	for {
-		s.Log.Debug("server-1 is working on it")
+		s.Log.Print("server-1 is working on it")
 		select {
 		case <-s.Ctx.Done(): // for gracefully shutdown
-			s.Log.Debug("server-1 canceled; no longer works")
+			s.Log.Print("server-1 canceled; no longer works")
 			return nil
 		case <-time.After(2 * time.Second):
 		}
@@ -82,16 +75,16 @@ func (s *Server) startServer1() error {
 }
 
 func (s *Server) startServer2() error {
-	s.Log.Debug("server-2 has been started")
-	defer s.Log.Debug("server-2 has been stopped")
+	s.Log.Print("server-2 has been started")
+	defer s.Log.Print("server-2 has been stopped")
 	for {
-		s.Log.Debug("server-2 is working on it")
+		s.Log.Print("server-2 is working on it")
 
 		// return errors.New("intentional error on server-2; no longer works")
 
 		select {
 		case <-s.Ctx.Done(): // for gracefully shutdown
-			s.Log.Debug("server-2 canceled; no longer works")
+			s.Log.Print("server-2 canceled; no longer works")
 			return nil
 		case <-time.After(2 * time.Second):
 		}
@@ -99,13 +92,10 @@ func (s *Server) startServer2() error {
 }
 
 func (s *Server) startHttpServer() error {
-	s.Log.Debug("HTTP server has been started")
-	defer s.Log.Debug("HTTP server has been stopped")
-
-	// Start HTTP server
 	var srv http.Server
 	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
+		s.Log.Print("http server has been started")
 		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
 			ctx = context.WithValue(ctx, "err", err)
 			cancel()
@@ -117,6 +107,7 @@ func (s *Server) startHttpServer() error {
 		return ctx.Value("err").(error)
 
 	case <-s.Ctx.Done(): // from receiver context
+		s.Log.Print("hippo asked to stop http server")
 		if err := srv.Shutdown(context.Background()); err != http.ErrServerClosed {
 			return err
 		}
@@ -125,6 +116,6 @@ func (s *Server) startHttpServer() error {
 }
 
 func (s *Server) Stop() error {
-	s.Log.Debug("all server has been stopped")
+	s.Log.Print("all server has been stopped")
 	return nil
 }
