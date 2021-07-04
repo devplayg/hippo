@@ -31,15 +31,15 @@ func main() {
 
 // Server
 type Server struct {
-	hippo.Launcher // DO NOT REMOVE; Launcher links server and hippo each other.
+    hippo.Launcher // DO NOT REMOVE; Launcher links server and hippo each other.
 }
 
 func (s *Server) Start() error {
-	return nil
+    return nil
 }
 
 func (s *Server) Stop() error {
-	return nil
+    return nil
 }
 ```
 
@@ -160,11 +160,11 @@ hippo has been stopped
 
 ```go
 func main() {
-	hippo := hippo.NewHippo(&Server{}, &hippo.Config{
-		Logger: logrus.New(),
-	})
-	if err := hippo.Start(); err != nil {
-		panic(err)
-	}
+    hippo := hippo.NewHippo(&Server{}, &hippo.Config{
+        Logger: logrus.New(),
+    })
+    if err := hippo.Start(); err != nil {
+        panic(err)
+    }
 }
 ```
