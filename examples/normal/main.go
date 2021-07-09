@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/devplayg/hippo"
+	"github.com/devplayg/hippo/v3"
 	"time"
 )
 

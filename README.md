@@ -12,7 +12,7 @@ The `hippo` helps servers start up safely and shut down gracefully.
 Import it in your program as:
 
 ```go
-import "github.com/devplayg/hippo"
+import "github.com/devplayg/hippo/v3"
 ```
 
 

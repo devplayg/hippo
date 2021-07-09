@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/devplayg/hippo"
+	"github.com/devplayg/hippo/v3"
 	"math/rand"
 	"sync/atomic"
 	"time"
