@@ -81,7 +81,7 @@ func (e *Hippo) initDirs() error {
 
 func (e *Hippo) initLogger() error {
 	if e.Config.Logger == nil {
-		e.log = log.Default()
+		e.log = log.New(os.Stdout, "", log.LstdFlags)
 		return nil
 	}
 	e.log = e.Config.Logger

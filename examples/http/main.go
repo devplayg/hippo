@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/devplayg/hippo/v3"
-	"log"
 	"net/http"
 	"sync"
 	"time"
@@ -28,12 +27,12 @@ func (s *ServerWithHttp) Start() error {
 	wg.Add(1)
 	go func() {
 		defer func() {
-			log.Print("server has been stopped")
+			s.Log.Print("server has been stopped")
 			wg.Done()
 		}()
-		log.Print("server has been started")
+		s.Log.Print("server has been started")
 		if err := s.startRepetitiveWork(); err != nil {
-			log.Print(fmt.Errorf("repetitive work error; %w", err))
+			s.Log.Print(fmt.Errorf("repetitive work error; %w", err))
 			s.Cancel() // error? Stop all servers
 			return
 		}
@@ -43,12 +42,12 @@ func (s *ServerWithHttp) Start() error {
 	wg.Add(1)
 	go func() {
 		defer func() {
-			log.Print("http server has been stopped")
+			s.Log.Print("http server has been stopped")
 			wg.Done()
 		}()
-		log.Print("http server has been started")
+		s.Log.Print("http server has been started")
 		if err := s.startHttpServer(); err != nil {
-			log.Print(fmt.Errorf("http server error; %w", err))
+			s.Log.Print(fmt.Errorf("http server error; %w", err))
 			s.Cancel() // error? Stop all servers
 			return
 		}
