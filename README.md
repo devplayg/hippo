@@ -2,7 +2,7 @@
 
 The `hippo` helps servers start up safely and shut down gracefully.
 
-[![Build Status](https://travis-ci.org/devplayg/hippo.svg?branch=master)](https://travis-ci.org/devplayg/hippo)
+[![Build Status](https://travis-ci.com/devplayg/hippo.svg?branch=master)](https://travis-ci.com/devplayg/hippo)
 [![Go Report Card](https://goreportcard.com/badge/github.com/devplayg/hippo)](https://goreportcard.com/report/github.com/devplayg/hippo)
 
 ![Hippo](hippo.png)
