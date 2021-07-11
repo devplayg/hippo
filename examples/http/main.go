@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/devplayg/hippo"
+	"github.com/devplayg/hippo/v3"
 	"log"
 	"net/http"
 	"sync"
