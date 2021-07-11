@@ -157,6 +157,7 @@ hippo has been stopped
 
 ## 5. Server with [Logrus](https://github.com/sirupsen/logrus)
 
+[Example](https://github.com/devplayg/hippo/blob/master/examples/logrus/main.go)
 
 ```go
 func main() {
