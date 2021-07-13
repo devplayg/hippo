@@ -1,6 +1,3 @@
-//package main
-
-/**
 package main
 
 import (
@@ -69,4 +66,3 @@ func createLogger(path string, debug, verbose bool) *logrus.Logger {
 	logger.SetOutput(file)
 	return logger
 }
-*/

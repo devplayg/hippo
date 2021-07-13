@@ -83,6 +83,8 @@ func (e *Hippo) initLogger() error {
 		e.log = log.New(os.Stdout, "", log.LstdFlags)
 		return nil
 	}
+	e.log = e.Config.Logger
+
 	return nil
 }
 
