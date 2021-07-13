@@ -40,7 +40,7 @@ func NewHippo(server Server, config *Config) *Hippo {
 	}
 }
 
-func (e *Hippo) init() error {
+func (e *Hippo) initHippo() error {
 	if err := e.initConfig(); err != nil {
 		return err
 	}
@@ -59,12 +59,11 @@ func (e *Hippo) initConfig() error {
 		return nil
 	}
 
-	config := newDefaultConfig(e.processName)
-	if len(e.Config.Name) < 1 {
-		e.Config.Name = config.Name
+	if len(strings.TrimSpace(e.Config.Name)) < 1 {
+		e.Config.Name = e.processName
 	}
-	if len(e.Config.Description) < 1 {
-		e.Config.Description = config.Description
+	if len(strings.TrimSpace(e.Config.Description)) < 1 {
+		e.Config.Description = e.processName
 	}
 
 	return nil
@@ -90,7 +89,7 @@ func (e *Hippo) initLogger() error {
 
 // Start starts server and opens error channel.
 func (e *Hippo) Start() error {
-	if err := e.init(); err != nil {
+	if err := e.initHippo(); err != nil {
 		return fmt.Errorf("failed to initialize hippo: %w", err)
 	}
 
@@ -113,10 +112,10 @@ func (e *Hippo) Start() error {
 // Stop stops hippo.
 func (e *Hippo) stop() error {
 	if err := e.server.Stop(); err != nil {
-		e.log.Printf("failed to stop %s", e.processName)
+		panic(err)
 		return err
 	}
-	e.log.Println("hippo has been stopped")
+	// e.log.Println("hippo has been stopped")
 	return nil
 }
 
