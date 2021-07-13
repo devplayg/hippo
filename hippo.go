@@ -40,7 +40,7 @@ func NewHippo(server Server, config *Config) *Hippo {
 	}
 }
 
-func (e *Hippo) initHippo() error {
+func (e *Hippo) init() error {
 	if err := e.initConfig(); err != nil {
 		return err
 	}
@@ -83,17 +83,19 @@ func (e *Hippo) initLogger() error {
 		e.log = log.New(os.Stdout, "", log.LstdFlags)
 		return nil
 	}
-	e.log = e.Config.Logger
 	return nil
 }
 
 // Start starts server and opens error channel.
 func (e *Hippo) Start() error {
-	if err := e.initHippo(); err != nil {
+	if err := e.init(); err != nil {
 		return fmt.Errorf("failed to initialize hippo: %w", err)
 	}
 
-	e.server.init(e)
+	if err := e.server.initLauncher(e); err != nil {
+		return fmt.Errorf("failed to initialize launcher: %w", err)
+	}
+
 	done := make(chan bool)
 	go func() {
 		e.log.Println("hippo has been started")
@@ -147,4 +149,8 @@ func (e *Hippo) Path(path string) string {
 	}
 
 	return filepath.ToSlash(filepath.Join(e.workingDir, path))
+}
+
+func (e *Hippo) Debug() bool {
+	return e.Config.Debug
 }

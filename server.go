@@ -4,5 +4,5 @@ package hippo
 type Server interface {
 	Start() error
 	Stop() error
-	init(e *Hippo)
+	initLauncher(e *Hippo) error
 }

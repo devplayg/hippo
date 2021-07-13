@@ -12,10 +12,12 @@ type Launcher struct {
 	WorkingDir string
 }
 
-func (l *Launcher) init(h *Hippo) {
+func (l *Launcher) initLauncher(h *Hippo) error {
 	l.Hippo = h
 	l.Log = h.log
 	l.Ctx = h.context()
 	l.Cancel = h.cancel
 	l.WorkingDir = h.workingDir
+
+	return nil
 }

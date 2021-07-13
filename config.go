@@ -13,7 +13,7 @@ func newDefaultConfig(processName string) *Config {
 	return &Config{
 		Name:        processName,
 		Description: processName,
-		Version:     "0.0.1",
+		Version:     "0.0.1-alpha",
 		Debug:       false,
 	}
 }
